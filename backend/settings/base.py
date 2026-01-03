@@ -25,8 +25,8 @@ DEFAULT_APPS = [
 ]
 
 CUSTOM_APPS = [
-    # "apps.authentication",
-    # "apps.customer",
+    "apps.administrator",
+    "apps.hostel",
     "apps.users",
 ]
 

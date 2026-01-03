@@ -1,0 +1,10 @@
+from django.apps import AppConfig
+
+
+class HostelConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.hostel"
+    label = "hostel"
+    
+    def ready(self):
+        import apps.hostel.signals

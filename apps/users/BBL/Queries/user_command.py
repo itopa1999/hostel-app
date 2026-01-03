@@ -19,22 +19,15 @@ class UserCommand:
         Returns:
             BaseResultWithData: Result with user details
         """
-        op = OperationLogger(
-            "UserCommand.Retrieve",
-            user_id=user_id
-        )
-        op.start()
         
         try:
             user = User.objects.get(id=user_id, is_deleted=False)
-            op.success(f"User {user_id} retrieved successfully")
             return BaseResultWithData(
                 message="User retrieved successfully",
                 data=UserDetailSerializer(user).data,
                 status_code=HTTPStatus.OK
             )
         except User.DoesNotExist:
-            op.fail("User not found")
             return BaseResultWithData(
                 message="User not found",
                 status_code=HTTPStatus.NOT_FOUND

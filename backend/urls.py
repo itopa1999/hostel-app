@@ -29,6 +29,8 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/backdoor/', permanent=False)),
     path('backdoor/', admin.site.urls),
     path('auth/api/', include("apps.users.urls")),
+    path('hostel/api/', include("apps.hostel.urls")),
+    path('admin/api/', include("apps.administrator.urls")),
     
     path(
         "doc/",
