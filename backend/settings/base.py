@@ -27,7 +27,7 @@ DEFAULT_APPS = [
 CUSTOM_APPS = [
     # "apps.authentication",
     # "apps.customer",
-    # "apps.vendor",
+    "apps.users",
 ]
 
 THIRD_PARTY_APPS = [
@@ -56,6 +56,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 ROOT_URLCONF = "backend.urls"
+# AUTH_USER_MODEL ='users.User'
 
 TEMPLATES = [
     {
@@ -103,6 +104,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:8000").split(",")
 CORS_ALLOW_CREDENTIALS = True
 
+APPEND_SLASH = False
 
 # JWT Settings
 SIMPLE_JWT = {
@@ -157,6 +159,7 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.FormParser",
         "rest_framework.parsers.MultiPartParser",
     ),
+    "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
 }
 
 # Swagger
@@ -173,73 +176,109 @@ SWAGGER_SETTINGS = {
     "PERSIST_AUTH": True,
 }
 
+DRF_STANDARDIZED_ERRORS = {
+    "ENABLE_IN_DEBUG_FOR_UNHANDLED_EXCEPTIONS": True,
+    "EXCEPTION_FORMATTER_CLASS": "backend.exception_formatter.ExceptionFormatter",
+}
 
-DJANGO_ENV = os.getenv("ENV", "dev")  # default to development
-
-if DJANGO_ENV in ["staging", "production"]:
-    ADMINS = [
-        ("Michael", "codewitgabi222@gmail.com"),
-        ("Lucky", "luckystarboy01@gmail.com"),
-        ("Artisan", "Info@artisansbridge.com"),
-    ]
-
-    LOGGING = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "filters": {
-            "require_debug_false": {
-                "()": "django.utils.log.RequireDebugFalse",
-            },
-        },
-        "handlers": {
-            "console": {
-                "level": "DEBUG",
-                "class": "logging.StreamHandler",
-                "formatter": "verbose",
-            },
-            "file": {
-                "level": "DEBUG",
-                "class": "logging.FileHandler",
-                "filename": "debug.log",
-                "formatter": "verbose",
-            },
-            "error_file": {
-                "level": "ERROR",
-                "class": "logging.FileHandler",
-                "filename": "errors.log",
-                "formatter": "verbose",
-            },
-            "mail_admins": {
-                "level": "ERROR",
-                "class": "django.utils.log.AdminEmailHandler",
-                "filters": ["require_debug_false"],
-                "email_backend": "django.core.mail.backends.smtp.EmailBackend",
-                "include_html": True,
-            },
-        },
-        "formatters": {
-            "verbose": {
-                "format": "[%(asctime)s] [%(levelname)s] [%(name)s:%(lineno)d] - %(message)s",
-                "datefmt": "%Y-%m-%d %H:%M:%S",
-            },
-            "standard": {
-                "format": "[%(asctime)s] [%(levelname)s] %(module)s - %(message)s",
-                "datefmt": "%Y-%m-%d %H:%M:%S",
-            },
-        },
-        "loggers": {
-            "django": {
-                "handlers": ["file", "mail_admins"],
-                "level": "INFO",
-                "propagate": True,
-            },
-            "django.request": {
-                "handlers": ["console", "error_file"],
-                "level": "ERROR",
-                "propagate": False,
-            },
-        },
-    }
-    
-    
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+ADMINS = [
+    ('Admin', 'salawulucky08071@gmail.com'),
+]
+# Log directory
+LOG_DIR = 'logs'
+os.makedirs(LOG_DIR, exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    # ===== FORMATTERS =====
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d}\n{message}',
+            'style': '{',
+        },
+        'structured': {
+            'format': '[{asctime}] [{levelname}] {name}: {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname}: {message}',
+            'style': '{',
+        },
+    },
+
+    # ===== FILTERS =====
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+
+    # ===== HANDLERS =====
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',  # Show everything in console
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'level': 'ERROR',  # Only write errors and tracebacks to file
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'app.log'),
+            'formatter': 'verbose',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'verbose',
+            'filters': ['require_debug_false'],
+        },
+    },
+
+    # ===== ROOT LOGGER =====
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'DEBUG',
+    },
+
+    # ===== DJANGO LOGGER =====
+    'loggers': {
+        # General Django logs
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+
+        # 🔥 Request logger: captures 500s with traceback
+        'django.request': {
+            'handlers': ['console', 'file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+
+        # Silence verbose Celery task registration logs
+        'celery.app.utils': {
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'celery.utils.functional': {
+            'level': 'WARNING',
+            'propagate': False,
+        },
+
+        # Optional: your project logger
+        'project': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}

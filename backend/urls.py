@@ -10,9 +10,9 @@ from django.views.static import serve
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Tool Connect API",
+        title="HOSTEL API",
         default_version="v1",
-        description="API description for Tool Connect App",
+        description="API description for Hostel App",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="contact@snippets.local"),
         license=openapi.License(name="BSD License"),
