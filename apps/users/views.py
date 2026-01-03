@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
 
 
-from apps.users.commands.login_command import LoginCommand
-from apps.users.commands.user_command import UserCommand
-from apps.users.serializers import ChangePasswordSerializer, LoginSerializer, UserCreateSerializer
+from apps.users.BBL.Commands.login_command import LoginCommand
+from apps.users.BBL.Commands.user_command import UserCommand as UserCommand
+from apps.users.BBL.Queries.user_command import UserCommand as UserQueryCommand
+from apps.users.serializers import ChangePasswordSerializer, LoginSerializer, UserCreateSerializer, UserDetailSerializer
 
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
@@ -66,3 +67,14 @@ class ChangePasswordViewAPI(generics.GenericAPIView):
         )
         
         return Response(result.to_dict(), status=result.status_code)
+    
+    
+class UserDetailViewAPI(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserDetailSerializer
+    
+    def get(self, request, *args, **kwargs):
+        result = UserQueryCommand.Retrieve(user_id=self.request.user.id)
+        return Response(result.to_dict(), status=result.status_code)
+
+
