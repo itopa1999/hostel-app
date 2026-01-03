@@ -7,8 +7,8 @@ from utils.base_model import BaseModel
 
 
 class User(BaseModel, AbstractUser):
-    username = models.CharField(max_length=40, unique=True, editable=False)
-    email = models.EmailField(max_length=40, unique=True, blank=True, null=True, editable=False)
+    username = models.CharField(max_length=40, unique=True)
+    email = models.EmailField(max_length=40, unique=True, blank=True, null=True)
     id_number = models.CharField(max_length=40, unique=True, null=True, blank=True, editable=False)
 
     groups = models.ManyToManyField(

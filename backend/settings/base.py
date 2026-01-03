@@ -59,7 +59,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 ROOT_URLCONF = "backend.urls"
-# AUTH_USER_MODEL ='users.User'
+AUTH_USER_MODEL ='users.User'
 
 TEMPLATES = [
     {

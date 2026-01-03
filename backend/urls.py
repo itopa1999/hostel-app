@@ -28,7 +28,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('', RedirectView.as_view(url='/backdoor/', permanent=False)),
     path('backdoor/', admin.site.urls),
-    # path('auth/api/', include("apps.authentication.urls")),
+    path('auth/api/', include("apps.users.urls")),
     
     path(
         "doc/",

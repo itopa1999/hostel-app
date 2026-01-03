@@ -1,3 +1,68 @@
-from django.shortcuts import render
+from django.contrib.auth import get_user_model
 
-# Create your views here.
+
+from apps.users.commands.login_command import LoginCommand
+from apps.users.commands.user_command import UserCommand
+from apps.users.serializers import ChangePasswordSerializer, LoginSerializer, UserCreateSerializer
+
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import generics
+
+from utils.permissions import IsAdminPermission
+
+
+User = get_user_model()
+
+
+class LoginViewAPI(generics.GenericAPIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    serializer_class = LoginSerializer
+    
+    def post(self, request, *args, **kwargs):
+        
+        result = LoginCommand.Execute(
+            username=request.data.get('username'),
+            password=request.data.get('password'),
+            request=request
+        )
+        
+        return Response(result.to_dict(), status=result.status_code)
+        
+        
+class UserCreateViewAPI(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated, IsAdminPermission]
+    serializer_class = UserCreateSerializer
+    
+    def post(self, request, *args, **kwargs):
+        result = UserCommand.Create(
+            username=request.data.get('username'),
+            first_name=request.data.get('first_name'),
+            last_name=request.data.get('last_name'),
+            password=request.data.get('password'),
+            groups=request.data.get('groups', []),
+            email=request.data.get('email'),
+            request=request
+        )
+        
+        return Response(result.to_dict(), status=result.status_code)
+    
+    
+class ChangePasswordViewAPI(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChangePasswordSerializer
+    
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        old_password = request.data.get('old_password')
+        new_password = request.data.get('new_password')
+        
+        result = UserCommand.changePassword(
+            user_id=user.id,
+            old_password=old_password,
+            new_password=new_password,
+        )
+        
+        return Response(result.to_dict(), status=result.status_code)

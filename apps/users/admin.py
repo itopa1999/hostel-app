@@ -12,7 +12,7 @@ class UserAdmin(admin.ModelAdmin):
     list_display_links = ("username" ,"email", "full_name_display")
     search_fields = ("username" ,"email", "first_name", "last_name", "id_number",)
     list_filter = ("is_active", "is_staff", "is_superuser", "created_at", "groups")
-    readonly_fields = ("date_joined", "last_login", "created_at", "modified_at")
+    readonly_fields = ("username", "email", "id_number", "date_joined", "last_login", "created_at", "modified_at", "created_by", "modified_by", "deleted_at", "deleted_by")
     filter_horizontal = ("groups", "user_permissions")
     ordering = ("-created_at",)
     date_hierarchy = "created_at"
