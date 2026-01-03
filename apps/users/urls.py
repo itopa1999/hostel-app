@@ -8,7 +8,6 @@ urlpatterns = [
         include(
             [
                 path("login/", LoginViewAPI.as_view()),
-                path("create/", UserCreateViewAPI.as_view()),
                 path("change-password/", ChangePasswordViewAPI.as_view()),
                 path("", UserDetailViewAPI.as_view()),
             ]

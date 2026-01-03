@@ -1,14 +1,16 @@
 from django.urls import path, include
-from apps.hostel.views import *
+from apps.administrator.views import *
 
 urlpatterns = [
     # Admin Hostel Management
     path(
-        "hostel/",
+        "admin/",
         include(
             [
-                # path("", LoginViewAPI.as_view()),
-             
+                path("create/", UserCreateViewAPI.as_view()),
+                path("change-password/", ChangeUserPasswordViewAPI.as_view()),
+                path("update/<int:user_id>/", UpdateUserViewAPI.as_view()),
+                path("delete/<int:user_id>/", ToggleDeleteUserViewAPI.as_view()),
             ]
         )
     ),

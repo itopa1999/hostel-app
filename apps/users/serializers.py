@@ -57,28 +57,7 @@ class UserDetailSerializer(UserSerializer):
             'modified_by',
             'deleted_by',
             'deleted_at',
-        ]
-
-
-class UserCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating users"""
-    
-    groups = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=__import__('django.contrib.auth.models', fromlist=['Group']).Group.objects.all()
-    )
-    
-    class Meta:
-        model = User
-        fields = [
-            'username',
-            'email',
-            'first_name',
-            'last_name',
-            'password',
-            'groups',
-        ]
-        
+        ]        
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

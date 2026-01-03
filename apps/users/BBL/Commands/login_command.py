@@ -6,7 +6,7 @@ from http import HTTPStatus
 
 from utils.base_result import BaseResultWithData
 from utils.log_helpers import OperationLogger
-from apps.users.models import User
+from utils.audit.audit_logger import AuditLogger
 
 
 class LoginCommand:
@@ -20,6 +20,7 @@ class LoginCommand:
         Args:
             username (str): Username
             password (str): Password
+            request: HTTP request object (optional)
                         
         Returns:
             BaseResultWithData: Result with tokens and user info
@@ -35,6 +36,11 @@ class LoginCommand:
         
         if not user:
             op.fail(f"Invalid credentials for user {username}")
+            AuditLogger.log_failure(
+                'LOGIN',
+                'User',
+                description=f"Failed login attempt for username {username} - Invalid credentials"
+            )
             return BaseResultWithData(
                 message="Invalid username or password",
                 status_code=HTTPStatus.UNAUTHORIZED
@@ -43,6 +49,13 @@ class LoginCommand:
         # Check if user is soft deleted
         if user.is_deleted:
             op.fail(f"User {username} has been deleted")
+            AuditLogger.log_failure(
+                'LOGIN',
+                'User',
+                performed_by=user,
+                target_user=user,
+                description=f"Failed login attempt for user {user.username} - Account deleted"
+            )
             return BaseResultWithData(
                 message="User account not found",
                 status_code=HTTPStatus.UNAUTHORIZED
@@ -50,6 +63,13 @@ class LoginCommand:
         
         if not user.is_active:
             op.fail(f"User {username} is inactive")
+            AuditLogger.log_failure(
+                'LOGIN',
+                'User',
+                performed_by=user,
+                target_user=user,
+                description=f"Failed login attempt for user {user.username} - Account inactive"
+            )
             return BaseResultWithData(
                 message="User account is inactive",
                 status_code=HTTPStatus.FORBIDDEN
@@ -64,6 +84,18 @@ class LoginCommand:
         group_names = ", ".join(user.groups.values_list("name", flat=True))
         
         op.success(f"Login successful for user {user.id}")
+        
+        # Log successful login
+        metadata = {}
+        if request:
+            metadata['ip_address'] = request.META.get('REMOTE_ADDR', 'Unknown')
+            metadata['user_agent'] = request.META.get('HTTP_USER_AGENT', 'Unknown')
+        
+        AuditLogger.log_login(
+            user=user,
+            description=f"User {user.username} logged in successfully",
+            metadata=metadata
+        )
         
         return BaseResultWithData(
             message="Login successful",
