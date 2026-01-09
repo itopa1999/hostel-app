@@ -12,12 +12,11 @@ class HotelCommand:
     """Hotel CRUD operations with audit logging"""
         
     @staticmethod
-    def Update(hotel_id, data, user=None):
+    def Update(data, user=None):
         """
         Update an existing hotel with partial updates and audit logging
         
         Args:
-            hotel_id: ID of the hotel to update
             data: Dictionary containing fields to update
             user: User object (from request)
         
@@ -33,16 +32,16 @@ class HotelCommand:
         
         try:
             try:
-                hotel = Hotel.objects.get(id=hotel_id, is_deleted=False)
+                hotel = Hotel.objects.filter(is_deleted=False).first()
             except Hotel.DoesNotExist:
-                op.fail(f"Hotel not found: {hotel_id}")
+                op.fail(f"Hotel not found")
                 
                 AuditLogger.log_failure(
                     action=AuditAction.UPDATE.value,
                     entity='Hotel',
-                    description=f"Hotel update failed - Hotel not found (ID: {hotel_id})",
+                    description=f"Hotel update failed - Hotel not found",
                     performed_by=user,
-                    metadata={'hotel_id': hotel_id}
+                    metadata={}
                 )
                 
                 return BaseResultWithData(
@@ -116,7 +115,7 @@ class HotelCommand:
                 entity='Hotel',
                 description=f"Hotel update failed - {str(e)}",
                 performed_by=user,
-                metadata={'error': str(e), 'hotel_id': hotel_id, 'attempted_updates': data}
+                metadata={'error': str(e), 'hotel_id': None, 'attempted_updates': data}
             )
             
             return BaseResultWithData(

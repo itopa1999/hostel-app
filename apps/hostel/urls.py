@@ -1,15 +1,3 @@
-from django.urls import path, include
-from apps.hostel.views import *
+from django.urls import path
 
-urlpatterns = [
-    # Hotel Management
-    path(
-        "hotel/",
-        include(
-            [
-                
-            ]
-        )
-    )
-    
-]
+urlpatterns = []

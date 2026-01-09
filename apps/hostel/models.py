@@ -2,8 +2,6 @@ from django.db import models
 from utils.base_model import BaseModel
 from utils.enums import RoomStatus, BookingStatus, PaymentMethod, PaymentStatus
 
-# Create your models here.
-
 class Hotel(BaseModel):
     name = models.CharField(max_length=255)
     id_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
@@ -25,25 +23,21 @@ class Hotel(BaseModel):
         return f"{self.name} ({self.city})"
     
 
-
 class Floor(BaseModel):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='floors')
-    number = models.PositiveIntegerField()
+    number = models.PositiveIntegerField(unique=True)
     description = models.CharField(max_length=100, blank=True)
 
     class Meta:
         verbose_name = "Floor"
         verbose_name_plural = "Floors"
-        unique_together = ("hotel", "number")
-        ordering = ['hotel', 'number']
+        ordering = ['number']
 
     def __str__(self):
-        return f"{self.hotel.name} - Floor {self.number}"
+        return f"Floor {self.number}"
 
     
 class RoomType(BaseModel):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='room_types')
-    name = models.CharField(max_length=50)  # Single, Deluxe, Suite
+    name = models.CharField(max_length=50, unique=True)
     base_price = models.DecimalField(max_digits=10, decimal_places=2)
     max_occupancy = models.PositiveIntegerField()
     description = models.TextField(blank=True)
@@ -52,18 +46,16 @@ class RoomType(BaseModel):
     class Meta:
         verbose_name = "Room Type"
         verbose_name_plural = "Room Types"
-        unique_together = ("hotel", "name")
-        ordering = ['hotel', 'name']
+        ordering = ['name']
 
     def __str__(self):
-        return f"{self.hotel.name} - {self.name}"
+        return f"{self.name}"
         
 
 class Room(BaseModel):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rooms')
     floor = models.ForeignKey(Floor, on_delete=models.SET_NULL, null=True, related_name='rooms')
     room_type = models.ForeignKey(RoomType, on_delete=models.PROTECT, related_name='rooms')
-    number = models.CharField(max_length=10)
+    number = models.CharField(max_length=10, unique=True)
     status = models.CharField(max_length=20, choices=RoomStatus.choices(), default=RoomStatus.AVAILABLE.value, db_index=True)
     price_override = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Override base price if set")
     notes = models.TextField(blank=True)
@@ -71,15 +63,13 @@ class Room(BaseModel):
     class Meta:
         verbose_name = "Room"
         verbose_name_plural = "Rooms"
-        unique_together = ("hotel", "number")
-        ordering = ['hotel', 'number']
+        ordering = ['number']
         indexes = [
             models.Index(fields=['status', '-created_at']),
-            models.Index(fields=['hotel', 'status']),
         ]
 
     def __str__(self):
-        return f"{self.hotel.name} - Room {self.number}"
+        return f"Room {self.number}"
 
 
 class GuestProfile(BaseModel):
@@ -180,6 +170,7 @@ class Payment(BaseModel):
 
     def __str__(self):
         return f"Payment {self.transaction_id or self.reference or self.id}"
+
 
 
 

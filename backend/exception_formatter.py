@@ -17,14 +17,12 @@ class ExceptionFormatter(BaseExceptionFormatter):
         error = error_response.errors[0] if error_response.errors else None
         status_code = getattr(error_response, "status_code", HTTPStatus.INTERNAL_SERVER_ERROR)
 
-        # Log error using custom logger
         op = OperationLogger("ExceptionFormatter", status_code=status_code)
         op.fail(
             f"API Error [{status_code}]: {getattr(error, 'detail', 'Unknown error')}",
             exc=None
         )
 
-        # ✅ Generic message for 500+ errors
         if status_code >= 500:
             return BaseResult(
                 status_code=500,
@@ -32,7 +30,6 @@ class ExceptionFormatter(BaseExceptionFormatter):
                 request_id=str(uuid.uuid4())
             ).to_dict()
 
-        # 🧩 For 4xx validation/client errors
         message = (
             f"{error.attr}: {error.detail}"
             if error and getattr(error, "attr", None)

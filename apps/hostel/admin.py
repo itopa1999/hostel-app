@@ -36,8 +36,6 @@ class HotelAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     list_per_page = 20
     
-    inlines = [FloorInline, RoomTypeInline, RoomInline]
-    
     fieldsets = (
         ('Basic Information', {
             'fields': ('name', 'id_number', 'email', 'phone')
@@ -62,16 +60,16 @@ class HotelAdmin(admin.ModelAdmin):
 # Floor Admin
 @admin.register(Floor)
 class FloorAdmin(admin.ModelAdmin):
-    list_display = ('hotel', 'number', 'description', 'created_at')
-    list_filter = ('hotel', 'created_at')
-    search_fields = ('hotel__name', 'number', 'description')
+    list_display = ('number', 'description', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('number', 'description')
     readonly_fields = ('created_at', 'modified_at', 'created_by', 'modified_by')
-    ordering = ('hotel', 'number')
+    ordering = ('number',)
     list_per_page = 30
     
     fieldsets = (
         ('Floor Information', {
-            'fields': ('hotel', 'number', 'description')
+            'fields': ('number', 'description')
         }),
         ('Base Model Info', {
             'fields': ('created_at', 'modified_at', 'created_by', 'modified_by', 'is_deleted', 'deleted_at', 'deleted_by'),
@@ -83,16 +81,16 @@ class FloorAdmin(admin.ModelAdmin):
 # Room Type Admin
 @admin.register(RoomType)
 class RoomTypeAdmin(admin.ModelAdmin):
-    list_display = ('hotel', 'name', 'base_price', 'max_occupancy', 'created_at')
-    list_filter = ('hotel', 'max_occupancy', 'created_at')
-    search_fields = ('hotel__name', 'name', 'description')
+    list_display = ('name', 'base_price', 'max_occupancy', 'created_at')
+    list_filter = ('max_occupancy', 'created_at')
+    search_fields = ('name', 'description')
     readonly_fields = ('created_at', 'modified_at', 'created_by', 'modified_by')
-    ordering = ('hotel', 'name')
+    ordering = ('name',)
     list_per_page = 25
     
     fieldsets = (
         ('Room Type Information', {
-            'fields': ('hotel', 'name', 'description')
+            'fields': ('name', 'description')
         }),
         ('Pricing & Occupancy', {
             'fields': ('base_price', 'max_occupancy')
@@ -110,18 +108,18 @@ class RoomTypeAdmin(admin.ModelAdmin):
 # Room Admin
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('room_number', 'hotel', 'floor', 'room_type', 'status_display', 'price_display', 'created_at')
-    list_display_links = ('room_number', 'hotel')
-    list_filter = ('status', 'hotel', 'room_type', 'floor', 'created_at')
-    search_fields = ('hotel__name', 'number', 'notes')
+    list_display = ('room_number', 'floor', 'room_type', 'status_display', 'price_display', 'created_at')
+    list_display_links = ('room_number',)
+    list_filter = ('status', 'room_type', 'floor', 'created_at')
+    search_fields = ('number', 'notes')
     readonly_fields = ('created_at', 'modified_at', 'created_by', 'modified_by')
-    ordering = ('hotel', 'number')
+    ordering = ('number',)
     date_hierarchy = 'created_at'
     list_per_page = 50
     
     fieldsets = (
         ('Room Information', {
-            'fields': ('hotel', 'floor', 'number', 'room_type')
+            'fields': ('floor', 'number', 'room_type')
         }),
         ('Pricing', {
             'fields': ('price_override',)
