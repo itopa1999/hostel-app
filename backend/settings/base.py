@@ -82,6 +82,25 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Database will be overridden in dev/staging/prod
 DATABASES = {}
 
+# Redis Cache Configuration
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/1"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PARSER_KWARGS": {"encoding": "utf8"},
+            "SOCKET_CONNECT_TIMEOUT": 5,
+            "SOCKET_TIMEOUT": 5,
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            "SERIALIZER": "django_redis.serializers.json.JSONSerializer",
+        },
+    }
+}
+
+# Cache TTL (Time To Live) in seconds - 1 day default
+CACHE_TTL = int(os.environ.get("CACHE_TTL", 60 * 60 * 24))
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -108,6 +127,24 @@ CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:
 CORS_ALLOW_CREDENTIALS = True
 
 APPEND_SLASH = False
+
+# Celery Configuration
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/0")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes hard limit
+CELERY_TASK_SOFT_TIME_LIMIT = 25 * 60  # 25 minutes soft limit
+
+
+
+# Default task settings with 3 retries
+CELERY_TASK_DEFAULT_RETRY_DELAY = 60  # Retry after 60 seconds
+CELERY_TASK_MAX_RETRIES = 3
+CELERY_TASK_DEFAULT_MAX_RETRIES = 3
 
 # JWT Settings
 SIMPLE_JWT = {

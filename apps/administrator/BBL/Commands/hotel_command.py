@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.utils.timezone import now
 from apps.hostel.models import Hotel
-from apps.hostel.serializers import HotelCreateSerializer, HotelUpdateSerializer
+from apps.administrator.serializers import HotelUpdateSerializer
 from utils.audit.audit_logger import AuditLogger
 from utils.enums import AuditAction
 from utils.base_result import BaseResultWithData
@@ -12,92 +12,7 @@ logger = logging.getLogger(__name__)
 
 class HotelCommand:
     """Hotel CRUD operations with audit logging"""
-    
-    @staticmethod
-    def Create(data, user=None):
-        """
-        Create a new hotel with transaction safety and audit logging
         
-        Args:
-            data: Dictionary containing hotel information
-            user: User object (from request)
-        
-        Returns:
-            BaseResultWithData with hotel data or error message
-        """
-        try:
-            serializer = HotelCreateSerializer(data=data)
-            
-            if not serializer.is_valid():
-                error_msg = f"Validation failed: {serializer.errors}"
-                logger.warning(f"Hotel creation validation error: {error_msg}")
-                
-                AuditLogger.log_failure(
-                    action=AuditAction.CREATE.value,
-                    entity='Hotel',
-                    description=f"Hotel creation failed - Validation error",
-                    performed_by=user,
-                    metadata={'errors': serializer.errors}
-                )
-                
-                return BaseResultWithData(
-                    message=error_msg,
-                    status_code=400,
-                    data=None
-                )
-            
-            with transaction.atomic():
-                hotel = serializer.save()
-                logger.info(f"Hotel created successfully: {hotel.id_number}")
-                
-                AuditLogger.log_create(
-                    entity='Hotel',
-                    description=f"Hotel '{hotel.name}' created with ID {hotel.id_number}",
-                    performed_by=user,
-                    metadata={
-                        'hotel_id': hotel.id,
-                        'name': hotel.name,
-                        'id_number': hotel.id_number,
-                        'city': hotel.city,
-                        'country': hotel.country,
-                        'email': hotel.email,
-                        'phone': hotel.phone,
-                    }
-                )
-                
-                result_data = {
-                    'id': hotel.id,
-                    'name': hotel.name,
-                    'id_number': hotel.id_number,
-                    'city': hotel.city,
-                    'country': hotel.country,
-                    'email': hotel.email,
-                    'phone': hotel.phone,
-                }
-                
-                return BaseResultWithData(
-                    message="Hotel created successfully",
-                    status_code=201,
-                    data=result_data
-                )
-        
-        except Exception as e:
-            logger.error(f"Hotel creation error: {str(e)}", exc_info=True)
-            
-            AuditLogger.log_failure(
-                action=AuditAction.CREATE.value,
-                entity='Hotel',
-                description=f"Hotel creation failed - {str(e)}",
-                performed_by=user,
-                metadata={'error': str(e)}
-            )
-            
-            return BaseResultWithData(
-                message=f"Hotel creation failed: {str(e)}",
-                status_code=500,
-                data=None
-            )
-    
     @staticmethod
     def Update(hotel_id, data, user=None):
         """

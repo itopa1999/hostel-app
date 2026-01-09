@@ -92,3 +92,20 @@ class PaymentStatus(Enum):
     def choices(cls):
         """Return choices for Django model field"""
         return [(status.value, status.value.title()) for status in cls]
+    
+    
+class CacheKeys(Enum):
+    """
+    Centralized cache key names for consistency across the project.
+    Always use CacheKeys.KEY_NAME.value when accessing cache.
+    """
+
+    @classmethod
+    def format(cls, key, **kwargs):
+        """
+        Helper method to fill in placeholders for formatted keys.
+        Example:
+            CacheKeys.format(CacheKeys.USER_PROFILE, user_id=5)
+        """
+        return key.value.format(**kwargs)
+    

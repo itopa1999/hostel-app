@@ -6,13 +6,13 @@ from utils.enums import RoomStatus, BookingStatus, PaymentMethod, PaymentStatus
 
 class Hotel(BaseModel):
     name = models.CharField(max_length=255)
-    id_number = models.CharField(max_length=20, unique=True)
+    id_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
     address = models.TextField()
-    city = models.CharField(max_length=100)
-    country = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=20, blank=True)
-    phone = models.CharField(max_length=20)
-    email = models.EmailField()
+    city = models.CharField(max_length=100, blank=True, null=True)
+    country = models.CharField(max_length=100, blank=True, null=True)
+    postal_code = models.CharField(max_length=20, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
     check_in_time = models.TimeField(default='14:00')
     check_out_time = models.TimeField(default='12:00')
 

@@ -2,7 +2,11 @@ from django.shortcuts import render
 from rest_framework import generics
 from django.contrib.auth import get_user_model
 
+
+from rest_framework.views import APIView
+from apps.administrator.BBL.Commands.hotel_command import HotelCommand
 from apps.administrator.serializers import *
+from apps.hostel.BBL.Queries.dashboard_query import DashboardQuery
 from utils.permissions import IsAdminPermission
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -82,3 +86,28 @@ class ToggleDeleteUserViewAPI(generics.GenericAPIView):
             performed_by=request.user
         )
         return Response(result.to_dict(), status=result.status_code)
+    
+    
+    
+
+# Hotel Endpoints
+class HotelUpdateAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated, IsAdminPermission]
+    serializer_class = HotelUpdateSerializer
+    
+    def put(self, request, hotel_id, *args, **kwargs):
+        result = HotelCommand.Update(hotel_id=hotel_id, data=request.data, user=request.user)
+        return Response(result.to_dict(), status=result.status_code)
+    
+    def patch(self, request, hotel_id, *args, **kwargs):
+        result = HotelCommand.Update(hotel_id=hotel_id, data=request.data, user=request.user)
+        return Response(result.to_dict(), status=result.status_code)
+
+
+class DashboardAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminPermission]
+    
+    def get(self, request):
+        result = DashboardQuery.GetDashboardMetrics()
+        return Response(result.to_dict(), status=result.status_code)
+
