@@ -114,6 +114,7 @@ class LoginSerializer(serializers.Serializer):
     
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)
+    group_id = serializers.IntegerField(required=True)
     
 
 class ChangePasswordSerializer(serializers.Serializer):

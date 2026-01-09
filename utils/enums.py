@@ -40,3 +40,55 @@ class AuditStatus(Enum):
     def choices(cls):
         """Return choices for Django model field"""
         return [(status.value, status.value.title()) for status in cls]
+
+
+class RoomStatus(Enum):
+    """Room status types"""
+    AVAILABLE = "AVAILABLE"
+    OCCUPIED = "OCCUPIED"
+    DIRTY = "DIRTY"
+    MAINTENANCE = "MAINTENANCE"
+    
+    @classmethod
+    def choices(cls):
+        """Return choices for Django model field"""
+        return [(status.value, status.value.title()) for status in cls]
+
+
+class BookingStatus(Enum):
+    """Booking status types"""
+    RESERVED = "RESERVED"
+    CHECKED_IN = "CHECKED_IN"
+    CHECKED_OUT = "CHECKED_OUT"
+    CANCELLED = "CANCELLED"
+    NO_SHOW = "NO_SHOW"
+    
+    @classmethod
+    def choices(cls):
+        """Return choices for Django model field"""
+        return [(status.value, status.value.replace('_', ' ').title()) for status in cls]
+
+
+class PaymentMethod(Enum):
+    """Payment method types"""
+    CASH = "CASH"
+    CARD = "CARD"
+    TRANSFER = "TRANSFER"
+    
+    @classmethod
+    def choices(cls):
+        """Return choices for Django model field"""
+        return [(method.value, method.value.title()) for method in cls]
+
+
+class PaymentStatus(Enum):
+    """Payment status types"""
+    PENDING = "PENDING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    REFUNDED = "REFUNDED"
+    
+    @classmethod
+    def choices(cls):
+        """Return choices for Django model field"""
+        return [(status.value, status.value.title()) for status in cls]

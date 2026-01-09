@@ -13,13 +13,14 @@ class LoginCommand:
     """Handle username/password login"""
     
     @staticmethod
-    def Execute(username, password, request=None):
+    def Execute(username, password, group_id, request=None):
         """
         Authenticate user with username and password.
         
         Args:
             username (str): Username
             password (str): Password
+            group_id (int): Group ID for additional validation
             request: HTTP request object (optional)
                         
         Returns:
@@ -30,6 +31,19 @@ class LoginCommand:
             username=username
         )
         op.start()
+        
+        # Validate group_id is provided
+        if not group_id:
+            op.fail(f"Group ID is required for login")
+            AuditLogger.log_failure(
+                'LOGIN',
+                'User',
+                description=f"Failed login attempt for username {username} - Group ID not provided"
+            )
+            return BaseResultWithData(
+                message="Group ID is required",
+                status_code=HTTPStatus.BAD_REQUEST
+            )
         
         # Authenticate user
         user = authenticate(username=username, password=password)
@@ -75,13 +89,35 @@ class LoginCommand:
                 status_code=HTTPStatus.FORBIDDEN
             )
         
+        # Validate group_id belongs to user
+        user_groups = user.groups.values_list('id', flat=True)
+        if group_id not in user_groups:
+            op.fail(f"User {username} does not belong to group {group_id}")
+            AuditLogger.log_failure(
+                'LOGIN',
+                'User',
+                performed_by=user,
+                target_user=user,
+                description=f"Failed login attempt for user {user.username} - Invalid group {group_id}"
+            )
+            return BaseResultWithData(
+                message="Login failed, user does not belong to the selected group",
+                status_code=HTTPStatus.FORBIDDEN
+            )
+        
         # Generate tokens
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
         
-        # Get group names
-        group_names = ", ".join(user.groups.values_list("name", flat=True))
+        # Get groups with id and name
+        groups = [
+            {
+                'id': group.id,
+                'name': group.name
+            }
+            for group in user.groups.all()
+        ]
         
         op.success(f"Login successful for user {user.id}")
         
@@ -106,7 +142,7 @@ class LoginCommand:
                 "username": user.username,
                 "name": f"{user.first_name} {user.last_name}",
                 "id_number": user.id_number,
-                "groups": group_names,
+                "groups": groups,
                 "is_staff": user.is_staff,
                 "is_superuser": user.is_superuser,
             },
