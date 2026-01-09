@@ -1,11 +1,10 @@
 import uuid
-import logging
 from http import HTTPStatus
 from drf_standardized_errors.formatter import ExceptionFormatter as BaseExceptionFormatter
 from drf_standardized_errors.types import ErrorResponse
 from utils.base_result import BaseResult
+from utils.log_helpers import OperationLogger
 
-logger = logging.getLogger(__name__)
 
 class ExceptionFormatter(BaseExceptionFormatter):
     """
@@ -18,10 +17,11 @@ class ExceptionFormatter(BaseExceptionFormatter):
         error = error_response.errors[0] if error_response.errors else None
         status_code = getattr(error_response, "status_code", HTTPStatus.INTERNAL_SERVER_ERROR)
 
-        # Log internally for debugging
-        logger.error(
+        # Log error using custom logger
+        op = OperationLogger("ExceptionFormatter", status_code=status_code)
+        op.fail(
             f"API Error [{status_code}]: {getattr(error, 'detail', 'Unknown error')}",
-            exc_info=True
+            exc=None
         )
 
         # ✅ Generic message for 500+ errors

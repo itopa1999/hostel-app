@@ -1,11 +1,12 @@
 from apps.administrator.models import AuditLog
 from django.contrib.auth import get_user_model
+from apps.administrator.tasks import log_audit_event
 
 User = get_user_model()
 
 
 class AuditLogger:
-    """Generic utility class for logging audit events"""
+    """Generic utility class for logging audit events - logs asynchronously via Celery"""
     
     @staticmethod
     def log(
@@ -20,7 +21,7 @@ class AuditLogger:
         metadata=None
     ):
         """
-        Create an audit log entry.
+        Create an audit log entry asynchronously via Celery task.
         
         Args:
             action (str): Action type (CREATE, READ, UPDATE, DELETE, LOGIN, LOGOUT, CHANGE_PASSWORD, TOGGLE_DELETE)
@@ -34,19 +35,21 @@ class AuditLogger:
             metadata (dict): Additional metadata
             
         Returns:
-            AuditLog: Created audit log entry
+            Celery AsyncResult: Task result object
         """
-        return AuditLog.objects.create(
+        # Queue audit logging in background via Celery
+        task = log_audit_event.delay(
             action=action,
             entity=entity,
             status=status,
-            performed_by=performed_by,
-            target_user=target_user,
             description=description or f"{action} {entity}",
+            performed_by_id=performed_by.id if performed_by else None,
+            target_user_id=target_user.id if target_user else None,
             old_values=old_values,
             new_values=new_values,
             metadata=metadata
         )
+        return task
     
     @staticmethod
     def log_create(entity, target_user=None, performed_by=None, description=None, metadata=None):

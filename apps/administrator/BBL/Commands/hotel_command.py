@@ -5,9 +5,7 @@ from apps.administrator.serializers import HotelUpdateSerializer
 from utils.audit.audit_logger import AuditLogger
 from utils.enums import AuditAction
 from utils.base_result import BaseResultWithData
-import logging
-
-logger = logging.getLogger(__name__)
+from utils.log_helpers import OperationLogger
 
 
 class HotelCommand:
@@ -26,11 +24,18 @@ class HotelCommand:
         Returns:
             BaseResultWithData with updated hotel data or error message
         """
+        
+        op = OperationLogger(
+            "HotelCommand.Update",
+            username=user.username if user else "Anonymous"
+        )
+        op.start()
+        
         try:
             try:
                 hotel = Hotel.objects.get(id=hotel_id, is_deleted=False)
             except Hotel.DoesNotExist:
-                logger.warning(f"Hotel not found: {hotel_id}")
+                op.fail(f"Hotel not found: {hotel_id}")
                 
                 AuditLogger.log_failure(
                     action=AuditAction.UPDATE.value,
@@ -50,7 +55,7 @@ class HotelCommand:
             
             if not serializer.is_valid():
                 error_msg = f"Validation failed: {serializer.errors}"
-                logger.warning(f"Hotel update validation error: {error_msg}")
+                op.fail(f"Hotel update validation error: {error_msg}")
                 
                 AuditLogger.log_failure(
                     action=AuditAction.UPDATE.value,
@@ -73,7 +78,7 @@ class HotelCommand:
             
             with transaction.atomic():
                 updated_hotel = serializer.save()
-                logger.info(f"Hotel updated successfully: {updated_hotel.id_number}")
+                op.success(f"Hotel updated successfully: {updated_hotel.id_number}")
                 
                 AuditLogger.log_update(
                     entity='Hotel',
@@ -104,7 +109,7 @@ class HotelCommand:
                 )
         
         except Exception as e:
-            logger.error(f"Hotel update error: {str(e)}", exc_info=True)
+            op.fail(f"Hotel update error: {str(e)}", exc=e)
             
             AuditLogger.log_failure(
                 action=AuditAction.UPDATE.value,
