@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from apps.hostel.models import Hotel, Floor, RoomType, Room, GuestProfile, Booking, Invoice, Payment
+from apps.hostel.models import Hotel, Floor, RoomType, Room, GuestProfile, Booking, Invoice, Payment, Setting
 
 
 # Inline Admins for Hotel
@@ -228,8 +228,7 @@ class BookingAdmin(admin.ModelAdmin):
     guest_name.short_description = "Guest"
     
     def room_display(self, obj):
-        hotel_name = obj.room.floor.hotel.name if obj.room.floor else "Unknown Hotel"
-        return f"{hotel_name} - Room {obj.room.number}"
+        return f"Room {obj.room.number}"
     room_display.short_description = "Room"
     
     def status_display(self, obj):
@@ -391,3 +390,33 @@ class PaymentAdmin(admin.ModelAdmin):
             obj.get_payment_status_display()
         )
     payment_status_display.short_description = "Status"
+
+
+# Setting Admin
+@admin.register(Setting)
+class SettingAdmin(admin.ModelAdmin):
+    """Settings admin for managing global tax and discount rates"""
+    list_display = ('tax_display', 'discount_display', 'modified_at')
+    readonly_fields = ('created_at', 'modified_at', 'created_by', 'modified_by', 'deleted_at', 'deleted_by', 'is_deleted')
+    ordering = ('-created_at',)
+    
+    fieldsets = (
+        ('Tax and Discount Settings', {
+            'fields': ('tax_percentage', 'default_discount_percentage')
+        }),
+        ('Notes', {
+            'fields': ('description',)
+        }),
+        ('Base Model Info', {
+            'fields': ('created_at', 'modified_at', 'created_by', 'modified_by', 'is_deleted', 'deleted_at', 'deleted_by'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def tax_display(self, obj):
+        return format_html('<span style="font-weight: bold; color: blue;">{}%</span>', obj.tax_percentage)
+    tax_display.short_description = "Tax %"
+    
+    def discount_display(self, obj):
+        return format_html('<span style="font-weight: bold; color: green;">{}%</span>', obj.default_discount_percentage)
+    discount_display.short_description = "Discount %"

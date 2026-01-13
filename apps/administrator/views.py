@@ -10,6 +10,7 @@ from apps.administrator.BBL.Commands.room_type_command import RoomTypeCommand
 from apps.administrator.BBL.Commands.room_command import RoomCommand
 from apps.administrator.BBL.Commands.guest_profile_command import GuestProfileCommand
 from apps.administrator.BBL.Commands.booking_command import BookingCommand
+from apps.administrator.BBL.Commands.invoice_command import InvoiceCommand
 from apps.administrator.serializers import *
 from apps.hostel.BBL.Queries.dashboard_query import DashboardQuery
 from apps.hostel.BBL.Queries.hotel_query import HotelQuery
@@ -18,7 +19,9 @@ from apps.hostel.BBL.Queries.room_type_query import RoomTypeQuery
 from apps.hostel.BBL.Queries.room_query import RoomQuery
 from apps.hostel.BBL.Queries.guest_profile_query import GuestProfileQuery
 from apps.hostel.BBL.Queries.booking_query import BookingQuery
-from apps.hostel.serializers import FloorSerializer, GuestProfileSerializer, RoomSerializer, RoomTypeSerializer, BookingSerializer
+from apps.hostel.BBL.Queries.invoice_query import InvoiceQuery
+from apps.hostel.BBL.Queries.payment_query import PaymentQuery
+from apps.hostel.serializers import FloorSerializer, GuestProfileSerializer, RoomSerializer, RoomTypeSerializer, BookingSerializer, InvoiceSerializer, PaymentSerializer
 from utils.permissions import IsAdminPermission
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -330,4 +333,59 @@ class BookingDetailAPIView(generics.GenericAPIView):
         result = BookingQuery.GetById(booking_id)
         return Response(result.to_dict(), status=result.status_code)
 
+
+class BookingToggleDeleteAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = BookingSerializer
+    
+    def delete(self, request, booking_id):
+        result = BookingCommand.ToggleDelete(booking_id, request.user)
+        return Response(result.to_dict(), status=result.status_code)
+
+
+# Invoice endpoints
+class InvoiceCreateAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = InvoiceSerializer
+    
+    def post(self, request):
+        result = InvoiceCommand.Create(request.data, request.user)
+        return Response(result.to_dict(), status=result.status_code)
+
+
+class InvoiceListAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = InvoiceSerializer
+    
+    def get(self, request):
+        result = InvoiceQuery.GetAll()
+        return Response(result.to_dict(), status=result.status_code)
+
+
+class InvoiceDetailAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = InvoiceSerializer
+    
+    def get(self, request, invoice_id):
+        result = InvoiceQuery.GetById(invoice_id)
+        return Response(result.to_dict(), status=result.status_code)
+
+
+# Payment endpoints
+class PaymentListAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PaymentSerializer
+    
+    def get(self, request):
+        result = PaymentQuery.GetAll()
+        return Response(result.to_dict(), status=result.status_code)
+
+
+class PaymentDetailAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PaymentSerializer
+    
+    def get(self, request, payment_id):
+        result = PaymentQuery.GetById(payment_id)
+        return Response(result.to_dict(), status=result.status_code)
 

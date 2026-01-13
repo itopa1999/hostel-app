@@ -85,6 +85,28 @@ urlpatterns = [
                 path("list/", BookingListAPIView.as_view(), name='booking-list'),
                 path("<int:booking_id>/", BookingDetailAPIView.as_view(), name='booking-detail'),
                 path("<int:booking_id>/update/", BookingUpdateAPIView.as_view(), name='booking-update'),
+                path("<int:booking_id>/delete/", BookingToggleDeleteAPIView.as_view(), name='booking-delete'),
+            ]
+        )
+    ),
+    # Invoice endpoints
+    path(
+        "invoice/",
+        include(
+            [
+                path("create/", InvoiceCreateAPIView.as_view(), name='invoice-create'),
+                path("list/", InvoiceListAPIView.as_view(), name='invoice-list'),
+                path("<int:invoice_id>/", InvoiceDetailAPIView.as_view(), name='invoice-detail'),
+            ]
+        )
+    ),
+    # Payment endpoints
+    path(
+        "payment/",
+        include(
+            [
+                path("list/", PaymentListAPIView.as_view(), name='payment-list'),
+                path("<int:payment_id>/", PaymentDetailAPIView.as_view(), name='payment-detail'),
             ]
         )
     ),

@@ -24,7 +24,6 @@ class Hotel(BaseModel):
     
 
 class Floor(BaseModel):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='floors')
     number = models.PositiveIntegerField(unique=True)
     description = models.CharField(max_length=100, blank=True)
 
@@ -71,6 +70,18 @@ class Room(BaseModel):
 
     def __str__(self):
         return f"Room {self.number}"
+    
+    def get_price(self):
+        """Get the effective price for this room. Returns price_override if set, otherwise room_type base_price"""
+        if self.price_override:
+            return self.price_override
+        return self.room_type.base_price
+    
+    def save(self, *args, **kwargs):
+        """Automatically set price_override to room_type base_price if not provided"""
+        if not self.price_override and self.room_type:
+            self.price_override = self.room_type.base_price
+        super().save(*args, **kwargs)
 
 
 class GuestProfile(BaseModel):
@@ -149,7 +160,7 @@ class Invoice(BaseModel):
 
 
 class Payment(BaseModel):
-    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='payments')
+    invoice = models.OneToOneField(Invoice, on_delete=models.CASCADE, related_name='payment')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     method = models.CharField(max_length=20, choices=PaymentMethod.choices())
     payment_status = models.CharField(max_length=20, choices=PaymentStatus.choices(), default=PaymentStatus.PENDING.value)
@@ -173,5 +184,26 @@ class Payment(BaseModel):
         return f"Payment {self.transaction_id or self.reference or self.id}"
 
 
+class Setting(BaseModel):
+    tax_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0, help_text="Tax percentage (e.g., 10.00 for 10%)")
+    default_discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0, help_text="Default discount percentage (e.g., 5.00 for 5%)")
+    description = models.TextField(blank=True, help_text="Description or notes about these settings")
 
+    class Meta:
+        verbose_name = "Setting"
+        verbose_name_plural = "Settings"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Settings - Tax: {self.tax_percentage}%, Discount: {self.default_discount_percentage}%"
+    
+    @classmethod
+    def get_settings(cls):
+        """Get the active settings or create default if none exists"""
+        settings = cls.objects.filter(is_deleted=False).first()
+        if settings:
+            return settings
+        # If no active settings exist, create and return a default one
+        settings, created = cls.objects.get_or_create(defaults={'tax_percentage': 0, 'default_discount_percentage': 0})
+        return settings
 

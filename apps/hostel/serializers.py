@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.hostel.models import Hotel, Floor, RoomType, Room, GuestProfile, Booking
+from apps.hostel.models import Hotel, Floor, RoomType, Room, GuestProfile, Booking, Invoice, Payment, Setting
 
 
 class HotelSerializer(serializers.ModelSerializer):
@@ -51,3 +51,43 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = ['id', 'guest', 'guest_name', 'room', 'room_number', 'room_type_name', 'confirmation_code', 'check_in', 'check_out', 'number_of_guests', 'status', 'payment_status', 'special_requests', 'cancellation_date', 'cancellation_reason', 'created_at', 'modified_at', 'is_deleted']
         read_only_fields = ['id', 'confirmation_code', 'created_at', 'modified_at', 'is_deleted']
+
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    booking_confirmation = serializers.CharField(source='booking.confirmation_code', read_only=True)
+    guest_name = serializers.CharField(source='booking.guest.name', read_only=True)
+    check_in = serializers.DateField(source='booking.check_in', read_only=True)
+    check_out = serializers.DateField(source='booking.check_out', read_only=True)
+    nights = serializers.SerializerMethodField()
+    room = serializers.CharField(source='booking.room.number', read_only=True)
+    room_type = serializers.CharField(source='booking.room.room_type.name', read_only=True)
+    number_of_guests = serializers.IntegerField(source='booking.number_of_guests', read_only=True)
+    
+    def get_nights(self, obj):
+        """Calculate number of nights from booking check_in and check_out dates"""
+        if obj.booking and obj.booking.check_in and obj.booking.check_out:
+            nights = (obj.booking.check_out - obj.booking.check_in).days
+            return nights if nights > 0 else 1
+        return 1
+    
+    class Meta:
+        model = Invoice
+        fields = ['id', 'booking', 'booking_confirmation', 'guest_name', 'room', 'room_type', 'number_of_guests', 'check_in', 'check_out', 'nights', 'invoice_number', 'subtotal', 'discount_amount', 'tax', 'total', 'payment_status', 'due_date', 'payment_date', 'notes', 'created_at', 'modified_at', 'is_deleted']
+        read_only_fields = ['id', 'invoice_number', 'created_at', 'modified_at', 'is_deleted']
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    invoice_number = serializers.CharField(source='invoice.invoice_number', read_only=True)
+    booking_confirmation = serializers.CharField(source='invoice.booking.confirmation_code', read_only=True)
+    
+    class Meta:
+        model = Payment
+        fields = ['id', 'invoice', 'invoice_number', 'booking_confirmation', 'amount', 'method', 'payment_status', 'transaction_id', 'receipt_number', 'reference', 'refund_date', 'refund_amount', 'notes', 'created_at', 'modified_at', 'is_deleted']
+        read_only_fields = ['id', 'created_at', 'modified_at', 'is_deleted']
+
+
+class SettingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Setting
+        fields = ['id', 'tax_percentage', 'default_discount_percentage', 'description', 'created_at', 'modified_at', 'is_deleted']
+        read_only_fields = ['id', 'created_at', 'modified_at', 'is_deleted']
