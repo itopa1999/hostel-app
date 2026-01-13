@@ -1,20 +1,20 @@
 from http import HTTPStatus
-from apps.hostel.models import Room
-from apps.hostel.serializers import RoomSerializer
+from apps.hostel.models import GuestProfile
+from apps.hostel.serializers import GuestProfileSerializer
 from utils.base_result import BaseResultWithData
 
 
-class RoomQuery:
+class GuestProfileQuery:
     
     @staticmethod
     def GetAll():
         try:
-            rooms = Room.objects.all()
-            serializer = RoomSerializer(rooms, many=True)
+            guests = GuestProfile.objects.all()
+            serializer = GuestProfileSerializer(guests, many=True)
             return BaseResultWithData(
                 data=serializer.data,
                 status_code=HTTPStatus.OK,
-                message="Rooms retrieved successfully"
+                message="Guest profiles retrieved successfully"
             )
         except Exception as e:
             return BaseResultWithData(
@@ -24,20 +24,20 @@ class RoomQuery:
             )
     
     @staticmethod
-    def GetById(room_id):
+    def GetById(guest_id):
         try:
-            room = Room.objects.get(id=room_id)
-            serializer = RoomSerializer(room)
+            guest = GuestProfile.objects.get(id=guest_id)
+            serializer = GuestProfileSerializer(guest)
             return BaseResultWithData(
                 data=serializer.data,
                 status_code=HTTPStatus.OK,
-                message="Room retrieved successfully"
+                message="Guest profile retrieved successfully"
             )
-        except Room.DoesNotExist:
+        except GuestProfile.DoesNotExist:
             return BaseResultWithData(
                 data=None,
                 status_code=HTTPStatus.NOT_FOUND,
-                message="Room not found"
+                message="Guest profile not found"
             )
         except Exception as e:
             return BaseResultWithData(

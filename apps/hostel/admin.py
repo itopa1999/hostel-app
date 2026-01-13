@@ -228,7 +228,8 @@ class BookingAdmin(admin.ModelAdmin):
     guest_name.short_description = "Guest"
     
     def room_display(self, obj):
-        return f"{obj.room.hotel.name} - Room {obj.room.number}"
+        hotel_name = obj.room.floor.hotel.name if obj.room.floor else "Unknown Hotel"
+        return f"{hotel_name} - Room {obj.room.number}"
     room_display.short_description = "Room"
     
     def status_display(self, obj):

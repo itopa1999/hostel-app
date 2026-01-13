@@ -24,6 +24,7 @@ class Hotel(BaseModel):
     
 
 class Floor(BaseModel):
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='floors')
     number = models.PositiveIntegerField(unique=True)
     description = models.CharField(max_length=100, blank=True)
 

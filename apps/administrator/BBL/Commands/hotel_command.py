@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.utils.timezone import now
+from http import HTTPStatus
 from apps.hostel.models import Hotel
 from apps.administrator.serializers import HotelUpdateSerializer
 from utils.audit.audit_logger import AuditLogger
@@ -37,17 +38,16 @@ class HotelCommand:
                 op.fail(f"Hotel not found")
                 
                 AuditLogger.log_failure(
-                    action=AuditAction.UPDATE.value,
-                    entity='Hotel',
-                    description=f"Hotel update failed - Hotel not found",
+                    'CHANGE_PASSWORD',
+                    'Hotel',
                     performed_by=user,
-                    metadata={}
+                    description=f"Hotel update failed - Hotel not found"
                 )
                 
                 return BaseResultWithData(
-                    message="Hotel not found",
-                    status_code=404,
-                    data=None
+                    data=None,
+                    status_code=HTTPStatus.NOT_FOUND,
+                    message="Hotel not found"
                 )
             
             serializer = HotelUpdateSerializer(hotel, data=data, partial=True)
@@ -57,17 +57,17 @@ class HotelCommand:
                 op.fail(f"Hotel update validation error: {error_msg}")
                 
                 AuditLogger.log_failure(
-                    action=AuditAction.UPDATE.value,
-                    entity='Hotel',
-                    description=f"Hotel update failed - Validation error",
+                    'UPDATE',
+                    'Hotel',
                     performed_by=user,
+                    description=f"Hotel update failed - Validation error",
                     metadata={'errors': serializer.errors, 'attempted_updates': data}
                 )
                 
                 return BaseResultWithData(
-                    message=error_msg,
-                    status_code=400,
-                    data=None
+                    data=None,
+                    status_code=HTTPStatus.BAD_REQUEST,
+                    message=error_msg
                 )
             
             # Store old values for audit
@@ -102,24 +102,24 @@ class HotelCommand:
                 }
                 
                 return BaseResultWithData(
-                    message="Hotel updated successfully",
-                    status_code=200,
-                    data=result_data
+                    data=result_data,
+                    status_code=HTTPStatus.OK,
+                    message="Hotel updated successfully"
                 )
         
         except Exception as e:
             op.fail(f"Hotel update error: {str(e)}", exc=e)
             
             AuditLogger.log_failure(
-                action=AuditAction.UPDATE.value,
-                entity='Hotel',
-                description=f"Hotel update failed - {str(e)}",
+                'UPDATE',
+                'Hotel',
                 performed_by=user,
-                metadata={'error': str(e), 'hotel_id': None, 'attempted_updates': data}
+                description=f"Hotel update failed - {str(e)}",
+                metadata={'error': str(e)}
             )
             
             return BaseResultWithData(
-                message=f"Hotel update failed: {str(e)}",
-                status_code=500,
-                data=None
+                data=None,
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                message=f"Hotel update failed: {str(e)}"
             )

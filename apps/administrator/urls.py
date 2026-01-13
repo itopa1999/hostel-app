@@ -19,6 +19,7 @@ urlpatterns = [
         include(
             [
                 path("update/", HotelUpdateAPIView.as_view(), name="hotel-update"),
+                path("details/", HotelDetailAPIView.as_view(), name="hotel-detail"),
                 path("dashboard/", DashboardAPIView.as_view(), name="dashboard"),
             ]
         )
@@ -59,6 +60,31 @@ urlpatterns = [
                 path("<int:room_id>/", RoomDetailAPIView.as_view(), name='room-detail'),
                 path("<int:room_id>/update/", RoomUpdateAPIView.as_view(), name='room-update'),
                 path("<int:room_id>/delete/", RoomDeleteAPIView.as_view(), name='room-delete'),
+            ]
+        )
+    ),
+    # Guest Profile endpoints
+    path(
+        "guest/",
+        include(
+            [
+                path("create/", GuestProfileCreateAPIView.as_view(), name='guest-create'),
+                path("list/", GuestProfileListAPIView.as_view(), name='guest-list'),
+                path("<int:guest_id>/", GuestProfileDetailAPIView.as_view(), name='guest-detail'),
+                path("<int:guest_id>/update/", GuestProfileUpdateAPIView.as_view(), name='guest-update'),
+                path("<int:guest_id>/delete/", GuestProfileDeleteAPIView.as_view(), name='guest-delete'),
+            ]
+        )
+    ),
+    # Booking endpoints
+    path(
+        "booking/",
+        include(
+            [
+                path("create/", BookingCreateAPIView.as_view(), name='booking-create'),
+                path("list/", BookingListAPIView.as_view(), name='booking-list'),
+                path("<int:booking_id>/", BookingDetailAPIView.as_view(), name='booking-detail'),
+                path("<int:booking_id>/update/", BookingUpdateAPIView.as_view(), name='booking-update'),
             ]
         )
     ),

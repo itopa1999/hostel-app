@@ -118,8 +118,8 @@ class DashboardQuery:
         # Hotel occupancy
         hotels_data = []
         for hotel in Hotel.objects.filter(is_deleted=False):
-            total_rooms_hotel = hotel.rooms.filter(is_deleted=False).count()
-            occupied_rooms = hotel.rooms.filter(
+            total_rooms_hotel = Room.objects.filter(is_deleted=False).count()
+            occupied_rooms = Room.objects.filter(
                 is_deleted=False,
                 status=RoomStatus.OCCUPIED.value
             ).count()
@@ -130,7 +130,7 @@ class DashboardQuery:
                 'name': hotel.name,
                 'total_rooms': total_rooms_hotel,
                 'occupied_rooms': occupied_rooms,
-                'available_rooms': hotel.rooms.filter(
+                'available_rooms': Room.objects.filter(
                     is_deleted=False,
                     status=RoomStatus.AVAILABLE.value
                 ).count(),
