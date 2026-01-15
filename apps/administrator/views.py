@@ -11,6 +11,7 @@ from apps.administrator.BBL.Commands.room_command import RoomCommand
 from apps.administrator.BBL.Commands.guest_profile_command import GuestProfileCommand
 from apps.administrator.BBL.Commands.booking_command import BookingCommand
 from apps.administrator.BBL.Commands.invoice_command import InvoiceCommand
+from apps.administrator.BBL.Commands.payment_command import PaymentCommand
 from apps.administrator.serializers import *
 from apps.hostel.BBL.Queries.dashboard_query import DashboardQuery
 from apps.hostel.BBL.Queries.hotel_query import HotelQuery
@@ -387,5 +388,14 @@ class PaymentDetailAPIView(generics.GenericAPIView):
     
     def get(self, request, payment_id):
         result = PaymentQuery.GetById(payment_id)
+        return Response(result.to_dict(), status=result.status_code)
+
+
+class PaymentUpdateStatusAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated, IsAdminPermission]
+    serializer_class = PaymentSerializer
+    
+    def put(self, request, payment_id):
+        result = PaymentCommand.Update(payment_id, request.data, user=request.user)
         return Response(result.to_dict(), status=result.status_code)
 

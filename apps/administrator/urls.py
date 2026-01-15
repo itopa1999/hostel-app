@@ -107,6 +107,7 @@ urlpatterns = [
             [
                 path("list/", PaymentListAPIView.as_view(), name='payment-list'),
                 path("<int:payment_id>/", PaymentDetailAPIView.as_view(), name='payment-detail'),
+                path("<int:payment_id>/update-status/", PaymentUpdateStatusAPIView.as_view(), name='payment-update-status'),
             ]
         )
     ),
