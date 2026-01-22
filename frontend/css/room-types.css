@@ -1,0 +1,197 @@
+/* ===== Room Types Page Styles ===== */
+
+.room-types-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@media (max-width: 1024px) {
+    .room-types-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .room-types-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card-header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-box-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-box-inline i {
+    color: #999;
+    font-size: 0.95rem;
+}
+
+.search-box-inline input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    outline: none;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.search-box-inline input::placeholder {
+    color: #999;
+}
+
+/* Room Type Specific Styles */
+.room-type-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.price-label {
+    font-size: 1.2rem;
+    color: #667eea;
+    font-weight: 600;
+}
+
+.price-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.price-period {
+    font-size: 0.85rem;
+    color: #999;
+    margin-left: 0.3rem;
+}
+
+.room-type-description {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.room-type-amenities {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.amenities-label {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.amenities-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.amenity-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.8rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    color: #667eea;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.amenity-tag::before {
+    content: '✓';
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-width: 100%;
+    }
+
+    .modal-content.modal-large {
+        max-width: 100%;
+    }
+
+    .room-type-card {
+        padding: 1.2rem;
+    }
+
+    .room-type-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .room-type-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .amenities-list {
+        max-height: 120px;
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 480px) {

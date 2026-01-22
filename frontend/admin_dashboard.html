@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - HotelOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin_dashboard.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+
+    <!-- Particle Effect -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-content">
+            <div class="loader"></div>
+            <div class="loader-content">
+                <h3>HotelOS Admin</h3>
+                <p>Loading hotel management system...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h2>HotelOS</h2>
+                <button class="sidebar-collapse-btn" id="desktopSidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- Navigation items generated dynamically by main.js -->
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="profile-mini">
+                    <img src="" alt="Admin" class="profile-avatar">
+                    <div class="profile-info">
+                        <p class="profile-name" id="user">Admin</p>
+                        <p class="profile-role">Administrator</p>
+                    </div>
+                </div>
+                <button class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-wrapper">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="mobileSidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb-wrapper">
+                        <span>Dashboard</span>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <h1>Welcome Back! 👋</h1>
+                    <p>Here's what's happening with your hotel today</p>
+                </div>
+
+                <!-- KPI Cards Row -->
+                <div class="kpi-cards">
+                    <div class="kpi-card kpi-rooms">
+                        <div class="kpi-header">
+                            <h3>Total Rooms</h3>
+                            <i class="fas fa-door-open"></i>
+                        </div>
+                        <div class="kpi-value" id="total-rooms">0</div>
+                        <div class="kpi-footer">
+                            <span class="kpi-label" id="occupancy-rate">0% occupancy</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card kpi-guests">
+                        <div class="kpi-header">
+                            <h3>Total Guests</h3>
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="kpi-value" id="total-guests">0</div>
+                        <div class="kpi-footer">
+                            <span class="kpi-label">Active guests</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card kpi-bookings">
+                        <div class="kpi-header">
+                            <h3>Total Bookings</h3>
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="kpi-value" id="total-bookings">0</div>
+                        <div class="kpi-footer">
+                            <span class="kpi-label" id="pending-payments">₦0 pending</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card kpi-revenue">
+                        <div class="kpi-header">
+                            <h3>Total Revenue</h3>
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="kpi-value" id="total-revenue">₦0</div>
+                        <div class="kpi-footer">
+                            <span class="kpi-label">All time earnings</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card kpi-hotels">
+                        <div class="kpi-header">
+                            <h3>Total Hotels</h3>
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="kpi-value" id="total-hotels">0</div>
+                        <div class="kpi-footer">
+                            <span class="kpi-label">Properties managed</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card kpi-floors">
+                        <div class="kpi-header">
+                            <h3>Total Floors</h3>
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="kpi-value" id="total-floors">0</div>
+                        <div class="kpi-footer">
+                            <span class="kpi-label">Across all hotels</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card kpi-invoices">
+                        <div class="kpi-header">
+                            <h3>Total Invoices</h3>
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div class="kpi-value" id="total-invoices">0</div>
+                        <div class="kpi-footer">
+                            <span class="kpi-label">Billing records</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card kpi-payments">
+                        <div class="kpi-header">
+                            <h3>Total Payments</h3>
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="kpi-value" id="total-payments">0</div>
+                        <div class="kpi-footer">
+                            <span class="kpi-label">Payment records</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two Column Layout -->
+                <div class="dashboard-grid">
+                    <!-- Left Column -->
+                    <div class="left-column">
+                        <!-- Room Status Chart -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Room Status Overview</h2>
+                                <div class="card-actions">
+                                    <button><i class="fas fa-ellipsis-h"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="status-overview">
+                                    <div class="status-bar-item">
+                                        <div class="status-label-row">
+                                            <span class="label">Available</span>
+                                            <span class="value" id="available-rooms">0</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress available" id="progress-available" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="status-bar-item">
+                                        <div class="status-label-row">
+                                            <span class="label">Occupied</span>
+                                            <span class="value" id="occupied-rooms">0</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress occupied" id="progress-occupied" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="status-bar-item">
+                                        <div class="status-label-row">
+                                            <span class="label">Maintenance</span>
+                                            <span class="value" id="maintenance-rooms">0</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress maintenance" id="progress-maintenance" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="status-bar-item">
+                                        <div class="status-label-row">
+                                            <span class="label">Dirty</span>
+                                            <span class="value" id="dirty-rooms">0</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress cleaning" id="progress-cleaning" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Bookings -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Recent Bookings</h2>
+                                <a href="bookings.html" class="view-all">View All</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="bookings-list" id="recent-bookings-list">
+                                    <div class="booking-item">
+                                        <div class="booking-avatar">-</div>
+                                        <div class="booking-details">
+                                            <p class="booking-name">Loading...</p>
+                                            <p class="booking-date">Please wait</p>
+                                        </div>
+                                        <div class="booking-status">
+                                            <span class="badge reserved">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Payments -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Recent Payments</h2>
+                                <a href="payments.html" class="view-all">View All</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="payments-list" id="recent-payments-list">
+                                    <div class="payment-item">
+                                        <div class="payment-info">
+                                            <p class="payment-amount">₦0</p>
+                                            <p class="payment-method">Loading...</p>
+                                        </div>
+                                        <div class="payment-meta">
+                                            <p class="payment-date">-</p>
+                                        </div>
+                                        <div class="payment-status">
+                                            <span class="badge reserved">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="right-column">
+                        <!-- Booking Status -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Booking Status</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="status-pills">
+                                    <div class="status-pill">
+                                        <div class="pill-icon reserved">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </div>
+                                        <div class="pill-content">
+                                            <p class="pill-label">Reserved</p>
+                                            <p class="pill-value" id="reserved-bookings">0</p>
+                                        </div>
+                                    </div>
+                                    <div class="status-pill">
+                                        <div class="pill-icon checked-in">
+                                            <i class="fas fa-door-open"></i>
+                                        </div>
+                                        <div class="pill-content">
+                                            <p class="pill-label">Checked In</p>
+                                            <p class="pill-value" id="checked-in-bookings">0</p>
+                                        </div>
+                                    </div>
+                                    <div class="status-pill">
+                                        <div class="pill-icon checked-out">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                        </div>
+                                        <div class="pill-content">
+                                            <p class="pill-label">Checked Out</p>
+                                            <p class="pill-value" id="checked-out-bookings">0</p>
+                                        </div>
+                                    </div>
+                                    <div class="status-pill">
+                                        <div class="pill-icon cancelled">
+                                            <i class="fas fa-times-circle"></i>
+                                        </div>
+                                        <div class="pill-content">
+                                            <p class="pill-label">Cancelled</p>
+                                            <p class="pill-value" id="cancelled-bookings">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Status -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Payment Status</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="payment-status-grid">
+                                    <div class="payment-stat">
+                                        <div class="payment-circle completed">
+                                            <p class="stat-number" id="completed-payment">0</p>
+                                        </div>
+                                        <p class="stat-label">Completed</p>
+                                    </div>
+                                    <div class="payment-stat">
+                                        <div class="payment-circle pending">
+                                            <p class="stat-number" id="pending-payment-stat">0</p>
+                                        </div>
+                                        <p class="stat-label">Pending</p>
+                                    </div>
+                                    <div class="payment-stat">
+                                        <div class="payment-circle failed">
+                                            <p class="stat-number" id="failed-payment">0</p>
+                                        </div>
+                                        <p class="stat-label">Failed</p>
+                                    </div>
+                                    <div class="payment-stat">
+                                        <div class="payment-circle refunded">
+                                            <p class="stat-number" id="refunded-payment">0</p>
+                                        </div>
+                                        <p class="stat-label">Refunded</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Quick Actions</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="action-buttons">
+                                    <button class="action-btn">
+                                        <i class="fas fa-plus-circle"></i>
+                                        <span>New Booking</span>
+                                    </button>
+                                    <button class="action-btn">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Add Guest</span>
+                                    </button>
+                                    <button class="action-btn">
+                                        <i class="fas fa-chart-bar"></i>
+                                        <span>Generate Report</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hotels Cards -->
+                <div class="card full-width">
+                    <div class="card-header">
+                        <h2>Hotels Overview</h2>
+                        <a href="hotels.html" class="view-all">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="hotels-grid" id="hotels-container">
+                            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading hotels...</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+    <script src="js/admin_dashboard.js"></script>
+</body>
+</html>

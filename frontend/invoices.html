@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoices - HotelOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/invoices.css">
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+    <div class="particles" id="particles"></div>
+    <div id="preloader">
+        <div class="preloader-content">
+            <div class="loader"></div>
+            <div class="loader-content">
+                <h3>HotelOS Admin</h3>
+                <p>Loading hotel management system...</p>
+            </div>
+        </div>
+    </div>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h2>HotelOS</h2>
+                <button class="sidebar-collapse-btn" id="desktopSidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav"></nav>
+            <div class="sidebar-footer">
+                <div class="profile-mini">
+                    <img src="" alt="Admin" class="profile-avatar">
+                    <div class="profile-info">
+                        <p class="profile-name" id="user">Admin</p>
+                        <p class="profile-role">Administrator</p>
+                    </div>
+                </div>
+                <button class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+        <div class="main-wrapper">
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="mobileSidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb-wrapper">
+                        <span>Invoices</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+            <main class="main-content">
+                <div class="welcome-section">
+                    <h1>Invoices Management 📄</h1>
+                    <p>Manage all guest invoices and billing</p>
+                </div>
+                <div class="card full-width">
+                    <div class="card-header">
+                        <h2>All Invoices</h2>
+                        <div class="card-header-actions">
+                            <div class="search-box-inline">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="invoiceSearchInput" placeholder="Search by invoice number or guest...">
+                            </div>
+                            <button class="action-btn create-invoice-btn" id="createInvoiceBtn" style="padding: 0.6rem 1.2rem; gap: 0.5rem;">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Create Invoice</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="invoices-list" id="invoicesList">
+                            <div style="text-align: center; padding: 2rem; color: #666;">Loading invoices...</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Create/Edit Invoice Modal -->
+            <div class="modal" id="invoiceModal">
+                <div class="modal-content modal-large">
+                    <div class="modal-header">
+                        <h2 id="modalTitle">Create New Invoice</h2>
+                        <button class="modal-close" id="closeInvoiceModal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="invoiceForm">
+                            <div class="form-group">
+                                <label for="bookingSelect">Booking *</label>
+                                <select id="bookingSelect" name="booking" required>
+                                    <option value="">Select a booking</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="notes">Notes</label>
+                                <textarea id="notes" name="notes" placeholder="Add any notes about this invoice" rows="4"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" id="cancelInvoiceBtn">Cancel</button>
+                        <button class="btn btn-primary" id="saveInvoiceBtn">Save Invoice</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div class="modal" id="deleteInvoiceModal">
+                <div class="modal-content modal-small">
+                    <div class="modal-header">
+                        <h2>Delete Invoice</h2>
+                        <button class="modal-close" id="closeDeleteModal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="deleteMessage">Are you sure you want to delete this invoice? This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
+                        <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+    <script src="js/invoices.js"></script>
+</body>
+</html>
