@@ -399,3 +399,12 @@ class PaymentUpdateStatusAPIView(generics.GenericAPIView):
         result = PaymentCommand.Update(payment_id, request.data, user=request.user)
         return Response(result.to_dict(), status=result.status_code)
 
+
+class PaymentToggleDeleteAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PaymentSerializer
+    
+    def delete(self, request, payment_id):
+        result = PaymentCommand.ToggleDelete(payment_id, request.user)
+        return Response(result.to_dict(), status=result.status_code)
+

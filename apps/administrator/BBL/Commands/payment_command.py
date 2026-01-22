@@ -103,6 +103,28 @@ class PaymentCommand:
                 except Exception as cascade_error:
                     op.fail(f"Warning: Failed to update related entities: {str(cascade_error)}")
             
+            # If payment is failed, update related entities
+            elif new_status == PaymentStatus.FAILED.value:
+                try:
+                    from utils.enums import BookingStatus
+                    # Get related invoice and booking
+                    invoice = payment.invoice
+                    booking = invoice.booking
+                    
+                    # Update invoice payment status to FAILED
+                    invoice.payment_status = PaymentStatus.FAILED.value
+                    invoice.save()
+                    op.success(f"Invoice {invoice.invoice_number} payment status updated to FAILED")
+                    
+                    # Update booking status to CANCELLED and payment status to FAILED
+                    booking.status = BookingStatus.CANCELLED.value
+                    booking.payment_status = PaymentStatus.FAILED.value
+                    booking.save()
+                    op.success(f"Booking {booking.confirmation_code} status updated to CANCELLED and payment status to FAILED")
+                    
+                except Exception as cascade_error:
+                    op.fail(f"Warning: Failed to update related entities: {str(cascade_error)}")
+            
             AuditLogger.log_update(Payment.__name__, performed_by=user, metadata=serialize_for_audit({'payment_id': payment.id, 'transaction_id': payment.transaction_id, 'new_status': new_status}))
             op.success(f"Payment {payment.transaction_id} updated successfully")
             
@@ -114,6 +136,49 @@ class PaymentCommand:
             )
         except Exception as e:
             op.fail(f"Failed to update payment: {str(e)}", exc=e)
+            return BaseResultWithData(
+                data=None,
+                status_code=HTTPStatus.BAD_REQUEST,
+                message=str(e)
+            )
+    
+    @staticmethod
+    def ToggleDelete(payment_id, user=None):
+        op = OperationLogger("PaymentCommand.ToggleDelete", payment_id=payment_id)
+        op.start()
+        
+        try:
+            payment = Payment.objects.get(id=payment_id)
+        except Payment.DoesNotExist:
+            op.fail(f"Payment with id {payment_id} not found")
+            return BaseResultWithData(
+                data=None,
+                status_code=HTTPStatus.NOT_FOUND,
+                message="Payment not found"
+            )
+        
+        try:
+            # Toggle the is_deleted flag
+            old_is_deleted = payment.is_deleted
+            payment.is_deleted = not payment.is_deleted
+            payment.save()
+            
+            action = "restored" if not payment.is_deleted else "deleted"
+            AuditLogger.log_update(
+                Payment.__name__, 
+                performed_by=user, 
+                old_values={"is_deleted": old_is_deleted},
+                new_values={"is_deleted": payment.is_deleted}
+            )
+            op.success(f"Payment {payment.transaction_id} {action} successfully")
+            result_serializer = PaymentSerializer(payment)
+            return BaseResultWithData(
+                data=result_serializer.data,
+                status_code=HTTPStatus.OK,
+                message=f"Payment {action} successfully"
+            )
+        except Exception as e:
+            op.fail(f"Failed to toggle delete payment: {str(e)}", exc=e)
             return BaseResultWithData(
                 data=None,
                 status_code=HTTPStatus.BAD_REQUEST,

@@ -61,6 +61,15 @@ class BookingCommand:
                         status_code=HTTPStatus.BAD_REQUEST,
                         message=f"The selected room is not available (current status: {room.status}). Please select another available room"
                     )
+                # Check if number of guests exceeds room occupancy
+                number_of_guests = data.get('number_of_guests', 1)
+                if number_of_guests > room.room_type.max_occupancy:
+                    op.fail(f"Number of guests ({number_of_guests}) exceeds room max occupancy ({room.room_type.max_occupancy})")
+                    return BaseResultWithData(
+                        data=None,
+                        status_code=HTTPStatus.BAD_REQUEST,
+                        message=f"The number of guests ({number_of_guests}) exceeds the room's maximum occupancy ({room.room_type.max_occupancy}). Please select a larger room or reduce the number of guests"
+                    )
             except Room.DoesNotExist:
                 op.fail(f"Room with id {data['room']} not found")
                 return BaseResultWithData(
@@ -321,6 +330,15 @@ class BookingCommand:
                         status_code=HTTPStatus.BAD_REQUEST,
                         message=f"The selected room is not available (current status: {room.status}). Please select another available room"
                     )
+                # Check if number of guests exceeds room occupancy
+                number_of_guests = data.get('number_of_guests', booking.number_of_guests)
+                if number_of_guests > room.room_type.max_occupancy:
+                    op.fail(f"Number of guests ({number_of_guests}) exceeds room max occupancy ({room.room_type.max_occupancy})")
+                    return BaseResultWithData(
+                        data=None,
+                        status_code=HTTPStatus.BAD_REQUEST,
+                        message=f"The number of guests ({number_of_guests}) exceeds the room's maximum occupancy ({room.room_type.max_occupancy}). Please select a larger room or reduce the number of guests"
+                    )
             except Room.DoesNotExist:
                 op.fail(f"Room with id {data['room']} not found")
                 return BaseResultWithData(
@@ -328,6 +346,18 @@ class BookingCommand:
                     status_code=HTTPStatus.NOT_FOUND,
                     message="Room not found"
                 )
+        else:
+            # If room is not being changed, check if number_of_guests is being updated
+            if 'number_of_guests' in data:
+                room = booking.room
+                number_of_guests = data['number_of_guests']
+                if number_of_guests > room.room_type.max_occupancy:
+                    op.fail(f"Number of guests ({number_of_guests}) exceeds room max occupancy ({room.room_type.max_occupancy})")
+                    return BaseResultWithData(
+                        data=None,
+                        status_code=HTTPStatus.BAD_REQUEST,
+                        message=f"The number of guests ({number_of_guests}) exceeds the room's maximum occupancy ({room.room_type.max_occupancy}). Please reduce the number of guests or change the room"
+                    )
         
         # Validate check-in and check-out dates if being updated
         from django.utils import timezone
