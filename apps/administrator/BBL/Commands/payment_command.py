@@ -90,15 +90,27 @@ class PaymentCommand:
                     invoice.save()
                     op.success(f"Invoice {invoice.invoice_number} status updated to COMPLETED with payment date {invoice.payment_date}")
                     
-                    # Update booking payment status and add payment_date if the field exists
-                    booking.payment_status = PaymentStatus.COMPLETED.value
-                    booking.save()
-                    op.success(f"Booking {booking.confirmation_code} payment status updated to COMPLETED")
+                    # Check if check-in date is today or in the past
+                    today = date.today()
+                    check_in_date = booking.check_in
                     
-                    # Update room status to OCCUPIED
-                    room.status = RoomStatus.OCCUPIED.value
-                    room.save()
-                    op.success(f"Room {room.number} status updated to OCCUPIED")
+                    if check_in_date <= today:
+                        # Check-in date has arrived, mark as CHECKED_IN and occupy room
+                        from utils.enums import BookingStatus
+                        booking.status = BookingStatus.CHECKED_IN.value
+                        booking.payment_status = PaymentStatus.COMPLETED.value
+                        booking.save()
+                        op.success(f"Booking {booking.confirmation_code} status updated to CHECKED_IN and payment status updated to COMPLETED")
+                        
+                        # Update room status to OCCUPIED
+                        room.status = RoomStatus.OCCUPIED.value
+                        room.save()
+                        op.success(f"Room {room.number} status updated to OCCUPIED")
+                    else:
+                        # Check-in date is in future, keep booking as RESERVED with payment completed
+                        booking.payment_status = PaymentStatus.COMPLETED.value
+                        booking.save()
+                        op.success(f"Booking {booking.confirmation_code} payment status updated to COMPLETED. Room will be marked OCCUPIED on check-in date ({check_in_date})")
                     
                 except Exception as cascade_error:
                     op.fail(f"Warning: Failed to update related entities: {str(cascade_error)}")
@@ -121,6 +133,29 @@ class PaymentCommand:
                     booking.payment_status = PaymentStatus.FAILED.value
                     booking.save()
                     op.success(f"Booking {booking.confirmation_code} status updated to CANCELLED and payment status to FAILED")
+                    
+                except Exception as cascade_error:
+                    op.fail(f"Warning: Failed to update related entities: {str(cascade_error)}")
+            
+            # If payment is changed back to pending, revert booking and invoice statuses
+            elif new_status == PaymentStatus.PENDING.value:
+                try:
+                    from utils.enums import BookingStatus
+                    # Get related invoice and booking
+                    invoice = payment.invoice
+                    booking = invoice.booking
+                    
+                    # Update invoice payment status back to PENDING
+                    invoice.payment_status = PaymentStatus.PENDING.value
+                    invoice.payment_date = None
+                    invoice.save()
+                    op.success(f"Invoice {invoice.invoice_number} payment status reverted to PENDING")
+                    
+                    # Update booking status back to RESERVED and payment status to PENDING
+                    booking.status = BookingStatus.RESERVED.value
+                    booking.payment_status = PaymentStatus.PENDING.value
+                    booking.save()
+                    op.success(f"Booking {booking.confirmation_code} status reverted to RESERVED and payment status to PENDING")
                     
                 except Exception as cascade_error:
                     op.fail(f"Warning: Failed to update related entities: {str(cascade_error)}")

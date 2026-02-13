@@ -130,6 +130,24 @@ class BookingCommand:
                     status_code=HTTPStatus.BAD_REQUEST,
                     message="Check-out date must be same or after check-in date"
                 )
+            
+            # Check for overlapping bookings for the same room
+            if 'room' in data and data['room'] and check_in_date and check_out_date:
+                overlapping_bookings = Booking.objects.filter(
+                    is_deleted=False,
+                    room_id=data['room'],
+                    check_in__lt=check_out_date,  # Existing booking starts before new booking ends
+                    check_out__gt=check_in_date   # Existing booking ends after new booking starts
+                ).exclude(status='CANCELLED')  # Don't count cancelled bookings
+                
+                if overlapping_bookings.exists():
+                    conflicting_booking = overlapping_bookings.first()
+                    op.fail(f"Room is already booked during this period. Conflicting booking: {conflicting_booking.confirmation_code} ({conflicting_booking.check_in} to {conflicting_booking.check_out})")
+                    return BaseResultWithData(
+                        data=None,
+                        status_code=HTTPStatus.BAD_REQUEST,
+                        message=f"Room is already booked from {conflicting_booking.check_in} to {conflicting_booking.check_out}. Please select different dates or another room."
+                    )
         
         serializer = BookingSerializer(data=data)
         if not serializer.is_valid():
@@ -391,6 +409,25 @@ class BookingCommand:
                 status_code=HTTPStatus.BAD_REQUEST,
                 message="Check-out date must be same or after check-in date"
             )
+        
+        # Check for overlapping bookings when dates or room is being changed
+        room_id = data.get('room', booking.room_id)
+        if check_in and check_out and room_id:
+            overlapping_bookings = Booking.objects.filter(
+                is_deleted=False,
+                room_id=room_id,
+                check_in__lt=check_out,
+                check_out__gt=check_in
+            ).exclude(id=booking_id).exclude(status='CANCELLED')  # Exclude current booking and cancelled bookings
+            
+            if overlapping_bookings.exists():
+                conflicting_booking = overlapping_bookings.first()
+                op.fail(f"Room is already booked during this period. Conflicting booking: {conflicting_booking.confirmation_code} ({conflicting_booking.check_in} to {conflicting_booking.check_out})")
+                return BaseResultWithData(
+                    data=None,
+                    status_code=HTTPStatus.BAD_REQUEST,
+                    message=f"Room is already booked from {conflicting_booking.check_in} to {conflicting_booking.check_out}. Please select different dates or another room."
+                )
         
         serializer = BookingSerializer(booking, data=data, partial=True)
         if not serializer.is_valid():

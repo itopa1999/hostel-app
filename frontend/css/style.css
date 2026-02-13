@@ -2244,6 +2244,8 @@ body {
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 [data-theme="dark"] .floor-card-header,

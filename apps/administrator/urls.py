@@ -112,4 +112,16 @@ urlpatterns = [
             ]
         )
     ),
+    # Report endpoints
+    path(
+        "reports/",
+        include(
+            [
+                path("occupancy/", OccupancyReportAPIView.as_view(), name='occupancy-report'),
+                path("revenue/", RevenueReportAPIView.as_view(), name='revenue-report'),
+                path("sales/", SalesReportAPIView.as_view(), name='sales-report'),
+                path("export/", ExportReportAPIView.as_view(), name='export-report'),
+            ]
+        )
+    ),
 ]

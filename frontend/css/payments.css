@@ -302,3 +302,12 @@
         gap: 0.5rem;
     }
 }
+
+/* Dark Mode Specific Styles */
+[data-theme="dark"] .payment-booking-code {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .value {
+    color: #e2e8f0;
+}

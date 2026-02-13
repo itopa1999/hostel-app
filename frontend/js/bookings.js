@@ -164,7 +164,7 @@ function displayBookingsAsCards(bookings) {
         <div class="booking-card" style="${booking.is_deleted ? 'opacity: 0.6; border: 2px solid #ff6b6b;' : ''}">
             <div class="booking-card-header">
                 <div class="booking-code">
-                    <span class="code-label">${booking.confirmation_code || 'N/A'} ${booking.is_deleted ? '<span style="color: #ff6b6b; font-size: 0.8em; margin-left: 0.5rem;">(Deleted)</span>' : ''}</span>
+                    <span class="code-label">${booking.confirmation_code || 'N/A'} <span style="font-size: 0.85em; color: #999;">(ID: ${booking.id})</span>${booking.is_deleted ? ' <span style="color: #ff6b6b; font-size: 0.8em;">(Deleted)</span>' : ''}</span>
                 </div>
                 <div class="status-badge status-${booking.status?.toLowerCase()}">
                     <i class="fas fa-circle"></i>

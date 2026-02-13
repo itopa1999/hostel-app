@@ -81,20 +81,24 @@
                                 <h2>Report Types</h2>
                             </div>
                             <div class="card-body">
+                                <div class="form-group" style="margin-bottom: 1.5rem;">
+                                    <label for="reportDate">Select Date</label>
+                                    <input type="date" id="reportDate" name="reportDate">
+                                </div>
                                 <div class="action-buttons">
-                                    <button class="action-btn">
+                                    <button class="action-btn" id="occupancyBtn" onclick="generateAndDisplayOccupancyReport()">
                                         <i class="fas fa-chart-bar"></i>
                                         <span>Occupancy Report</span>
                                     </button>
-                                    <button class="action-btn">
+                                    <button class="action-btn" id="revenueBtn" onclick="generateAndDisplayRevenueReport()">
                                         <i class="fas fa-money-bill-wave"></i>
                                         <span>Revenue Report</span>
                                     </button>
-                                    <button class="action-btn">
+                                    <button class="action-btn" id="salesBtn" onclick="generateAndDisplaySalesReport()">
                                         <i class="fas fa-chart-line"></i>
                                         <span>Sales Report</span>
                                     </button>
-                                    <button class="action-btn">
+                                    <button class="action-btn" id="exportBtn" onclick="generateAndDisplayExportReport()">
                                         <i class="fas fa-file-csv"></i>
                                         <span>Export Report</span>
                                     </button>
@@ -105,29 +109,12 @@
                     <div class="right-column">
                         <div class="card">
                             <div class="card-header">
-                                <h2>Recent Reports</h2>
+                                <h2>Report Output</h2>
                             </div>
                             <div class="card-body">
-                                <div class="bookings-list">
-                                    <div class="booking-item">
-                                        <div class="booking-avatar">OR</div>
-                                        <div class="booking-details">
-                                            <p class="booking-name">Occupancy Report</p>
-                                            <p class="booking-date">Generated today</p>
-                                        </div>
-                                        <div class="booking-status">
-                                            <span class="badge reserved">PDF</span>
-                                        </div>
-                                    </div>
-                                    <div class="booking-item">
-                                        <div class="booking-avatar">RR</div>
-                                        <div class="booking-details">
-                                            <p class="booking-name">Revenue Report</p>
-                                            <p class="booking-date">Generated 2 days ago</p>
-                                        </div>
-                                        <div class="booking-status">
-                                            <span class="badge checked-in">Excel</span>
-                                        </div>
+                                <div id="reportOutput" style="max-height: 600px; overflow-y: auto;">
+                                    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                        <p>Select a report type and click generate to view results</p>
                                     </div>
                                 </div>
                             </div>

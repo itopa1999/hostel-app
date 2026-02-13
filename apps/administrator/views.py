@@ -12,6 +12,7 @@ from apps.administrator.BBL.Commands.guest_profile_command import GuestProfileCo
 from apps.administrator.BBL.Commands.booking_command import BookingCommand
 from apps.administrator.BBL.Commands.invoice_command import InvoiceCommand
 from apps.administrator.BBL.Commands.payment_command import PaymentCommand
+from apps.hostel.BBL.Commands.report_command import ReportCommand
 from apps.administrator.serializers import *
 from apps.hostel.BBL.Queries.dashboard_query import DashboardQuery
 from apps.hostel.BBL.Queries.hotel_query import HotelQuery
@@ -408,3 +409,39 @@ class PaymentToggleDeleteAPIView(generics.GenericAPIView):
         result = PaymentCommand.ToggleDelete(payment_id, request.user)
         return Response(result.to_dict(), status=result.status_code)
 
+
+# Report endpoints
+class OccupancyReportAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated, IsAdminPermission]
+    
+    def get(self, request):
+        date = request.query_params.get('date', None)
+        result = ReportCommand.GenerateOccupancyReport(date)
+        return Response(result.to_dict(), status=result.status_code)
+
+
+class RevenueReportAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated, IsAdminPermission]
+    
+    def get(self, request):
+        date = request.query_params.get('date', None)
+        result = ReportCommand.GenerateRevenueReport(date)
+        return Response(result.to_dict(), status=result.status_code)
+
+
+class SalesReportAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated, IsAdminPermission]
+    
+    def get(self, request):
+        date = request.query_params.get('date', None)
+        result = ReportCommand.GenerateSalesReport(date)
+        return Response(result.to_dict(), status=result.status_code)
+
+
+class ExportReportAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated, IsAdminPermission]
+    
+    def get(self, request):
+        date = request.query_params.get('date', None)
+        result = ReportCommand.GenerateExportReport(date)
+        return Response(result.to_dict(), status=result.status_code)

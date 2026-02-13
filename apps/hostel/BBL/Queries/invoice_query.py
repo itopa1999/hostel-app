@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from datetime import date
 from apps.hostel.models import Invoice
 from apps.hostel.serializers import InvoiceSerializer
 from utils.base_result import BaseResultWithData
@@ -11,8 +12,16 @@ class InvoiceQuery:
         try:
             invoices = Invoice.objects.all()
             serializer = InvoiceSerializer(invoices, many=True)
+            
+            # Add today's date to each invoice item
+            today = date.today().isoformat()
+            data_with_date = []
+            for item in serializer.data:
+                item['today'] = today
+                data_with_date.append(item)
+            
             return BaseResultWithData(
-                data=serializer.data,
+                data=data_with_date,
                 status_code=HTTPStatus.OK,
                 message="Invoices retrieved successfully"
             )

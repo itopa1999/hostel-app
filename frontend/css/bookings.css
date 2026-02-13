@@ -61,9 +61,10 @@
     font-size: 1.1rem;
     font-weight: 700;
     color: #333;
-    flex: 1;
+    flex: 1 1 auto;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .code-label {
@@ -169,6 +170,17 @@
 
 .delete-booking-btn:hover {
     background: #ff6b6b;
+    color: white;
+    transform: scale(1.1);
+}
+
+.reactivate-booking-btn {
+    color: #4caf50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.reactivate-booking-btn:hover {
+    background: #4caf50;
     color: white;
     transform: scale(1.1);
 }
@@ -436,4 +448,13 @@
         height: 32px;
         font-size: 0.9rem;
     }
+}
+
+/* Dark Mode Specific Styles */
+[data-theme="dark"] .code-label {
+    color: #e0e7ff;
+}
+
+[data-theme="dark"] .date-label {
+    color: #cbd5e1;
 }

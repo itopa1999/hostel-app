@@ -372,9 +372,9 @@ if (username && userSpan) {
     userSpan.innerHTML = username;
 }
 
-const USER_URL = "http://192.168.0.200:8000/auth/api/user/";
-const HOSTEL_URL = "http://192.168.0.200:8000/hotel/api/hotel/";
-const ADMIN_URL = "http://192.168.0.200:8000/admin/api/";
+const USER_URL = "http://127.0.0.1:8000/auth/api/user/";
+const HOSTEL_URL = "http://127.0.0.1:8000/hotel/api/hotel/";
+const ADMIN_URL = "http://127.0.0.1:8000/admin/api/";
 
 // Humanize date function - Convert date to relative time (e.g., "2 days ago")
 function humanizeDate(dateString) {
