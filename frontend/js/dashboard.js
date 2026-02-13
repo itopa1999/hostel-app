@@ -2,7 +2,7 @@
 let accessToken = null;
 
 if (typeof CookieManager === 'undefined') {
-    console.error('CookieManager not found. Make sure main.js is loaded before admin_dashboard.js');
+    console.error('CookieManager not found. Make sure main.js is loaded before dashboard.js');
     window.location.href = "auth.html";
 } else {
     accessToken = CookieManager.get("access_token");

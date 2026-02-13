@@ -1,0 +1,61 @@
+/* ===== Reports Page Styles ===== */
+
+#reportOutput {
+    margin-top: 2rem;
+}
+
+/* Dark Mode Specific Styles */
+[data-theme="dark"] #reportOutput {
+    color: var(--text);
+}
+
+[data-theme="dark"] #reportOutput p {
+    color: var(--text);
+}
+
+[data-theme="dark"] #reportOutput h3,
+[data-theme="dark"] #reportOutput h4 {
+    color: #8a63ff;
+}
+
+[data-theme="dark"] .badge {
+    background: rgba(138, 99, 255, 0.2);
+    color: #8a63ff;
+}
+
+[data-theme="dark"] [style*="background: var(--bg-secondary)"] {
+    background: rgba(20, 20, 35, 0.5) !important;
+}
+
+/* Improve visibility of report values in dark mode */
+[data-theme="dark"] [style*="font-size: 1.8rem"] {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] [style*="font-size: 1.2rem"] {
+    color: #e2e8f0 !important;
+}
+
+/* Total Revenue card - better visibility in dark mode */
+[data-theme="dark"] [style*="linear-gradient(135deg, var(--primary)"] {
+    background: linear-gradient(135deg, rgba(138, 99, 255, 0.3) 0%, rgba(138, 99, 255, 0.2) 100%) !important;
+}
+
+[data-theme="dark"] [style*="linear-gradient(135deg, var(--primary)"] p {
+    color: #e2e8f0 !important;
+}
+
+/* Discount value visibility in dark mode */
+[data-theme="dark"] [style*="color: #ff6b6b"] {
+    color: #ff8a8a !important;
+}
+
+/* Tax value visibility in dark mode */
+[data-theme="dark"] [style*="color: #4caf50"] {
+    color: #66bb6a !important;
+}
+
+/* Ensure text muted colors are visible */
+[data-theme="dark"] [style*="color: var(--text-muted)"] {
+    color: #a0aec0 !important;
+}

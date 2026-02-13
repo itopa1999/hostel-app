@@ -1,0 +1,176 @@
+/* ===== Staff Page Styles ===== */
+
+.card-header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-box-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-box-inline i {
+    color: #999;
+    font-size: 0.95rem;
+}
+
+.search-box-inline input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    outline: none;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.search-box-inline input::placeholder {
+    color: #999;
+}
+
+.staff-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@media (max-width: 1024px) {
+    .staff-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .staff-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Staff Card Specific Styles */
+.staff-name::before {
+    content: '👤';
+    margin-right: 0.5rem;
+    font-size: 1rem;
+}
+
+.staff-status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    color: #667eea;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.staff-status-badge i {
+    font-size: 0.85rem;
+}
+
+.staff-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Staff Info Custom Overrides */
+.info-value {
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+}
+
+.staff-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 8px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #999;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+/* Animations */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Dark Mode Specific Styles */
+[data-theme="dark"] .search-box-inline {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(110, 68, 255, 0.2);
+}
+
+[data-theme="dark"] .search-box-inline i {
+    color: #a0aec0;
+}
+
+[data-theme="dark"] .search-box-inline input {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .search-box-inline input::placeholder {
+    color: #a0aec0;
+}
+
+[data-theme="dark"] .staff-status-badge {
+    background: rgba(138, 99, 255, 0.1);
+    color: #8a63ff;
+}
+
+[data-theme="dark"] .staff-stats {
+    background: rgba(138, 99, 255, 0.05);
+}
+
+[data-theme="dark"] .stat-label {
+    color: #a0aec0;
+}
+
+[data-theme="dark"] .stat-value {
+    color: #8a63ff;
+}

@@ -24,7 +24,7 @@ from apps.hostel.BBL.Queries.booking_query import BookingQuery
 from apps.hostel.BBL.Queries.invoice_query import InvoiceQuery
 from apps.hostel.BBL.Queries.payment_query import PaymentQuery
 from apps.hostel.serializers import FloorSerializer, GuestProfileSerializer, RoomSerializer, RoomTypeSerializer, BookingSerializer, InvoiceSerializer, PaymentSerializer
-from utils.permissions import IsAdminPermission
+from utils.permissions import IsAdminPermission, IsAuthenticatedAndNotDeleted
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from apps.administrator.BBL.Commands.user_command import UserCommand
@@ -34,7 +34,7 @@ from utils.base_result import BaseResultWithData
 User = get_user_model()
 
 class UserCreateViewAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = UserCreateSerializer
     
     def post(self, request, *args, **kwargs):
@@ -53,7 +53,7 @@ class UserCreateViewAPI(generics.GenericAPIView):
 
 
 class ChangeUserPasswordViewAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = ChangeUserPasswordSerializer
     
     def post(self, request, *args, **kwargs):
@@ -69,7 +69,7 @@ class ChangeUserPasswordViewAPI(generics.GenericAPIView):
     
     
 class UpdateUserViewAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = UserUpdateSerializer
     
     def put(self, request, user_id, *args, **kwargs):
@@ -96,7 +96,7 @@ class UpdateUserViewAPI(generics.GenericAPIView):
     
     
 class ToggleDeleteUserViewAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     
     def delete(self, request, user_id, *args, **kwargs):
         result = UserCommand.ToggleDelete(
@@ -110,7 +110,7 @@ class ToggleDeleteUserViewAPI(generics.GenericAPIView):
 
 # Hotel Endpoints
 class HotelUpdateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = HotelUpdateSerializer
     
     def put(self, request, *args, **kwargs):
@@ -123,7 +123,7 @@ class HotelUpdateAPIView(generics.GenericAPIView):
 
 
 class HotelDetailAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = HotelDetailSerializer
     def get(self, request):
         result = HotelQuery.GetFirst()
@@ -131,7 +131,7 @@ class HotelDetailAPIView(generics.GenericAPIView):
 
 
 class DashboardAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     
     def get(self, request):
         result = DashboardQuery.GetDashboardMetrics()
@@ -139,7 +139,7 @@ class DashboardAPIView(APIView):
 
 
 class FloorCreateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = FloorSerializer
     def post(self, request):
         result = FloorCommand.Create(request.data, request.user)
@@ -147,7 +147,7 @@ class FloorCreateAPIView(generics.GenericAPIView):
 
 
 class FloorUpdateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = FloorSerializer
     def put(self, request, floor_id):
         result = FloorCommand.Update(floor_id, request.data, request.user)
@@ -155,7 +155,7 @@ class FloorUpdateAPIView(generics.GenericAPIView):
 
 
 class FloorListAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = FloorSerializer
     def get(self, request):
         result = FloorQuery.GetAll()
@@ -163,7 +163,7 @@ class FloorListAPIView(generics.GenericAPIView):
 
 
 class FloorDetailAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = FloorSerializer
     def get(self, request, floor_id):
         result = FloorQuery.GetById(floor_id)
@@ -171,7 +171,7 @@ class FloorDetailAPIView(generics.GenericAPIView):
 
 
 class FloorDeleteAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = FloorSerializer
     def delete(self, request, floor_id):
         result = FloorCommand.ToggleDelete(floor_id, request.user)
@@ -179,7 +179,7 @@ class FloorDeleteAPIView(generics.GenericAPIView):
 
 
 class RoomTypeCreateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = RoomTypeSerializer
     def post(self, request):
         result = RoomTypeCommand.Create(request.data, request.user)
@@ -187,7 +187,7 @@ class RoomTypeCreateAPIView(generics.GenericAPIView):
 
 
 class RoomTypeUpdateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = RoomTypeSerializer
     def put(self, request, room_type_id):
         result = RoomTypeCommand.Update(room_type_id, request.data, request.user)
@@ -195,7 +195,7 @@ class RoomTypeUpdateAPIView(generics.GenericAPIView):
 
 
 class RoomTypeListAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = RoomTypeSerializer
     def get(self, request):
         result = RoomTypeQuery.GetAll()
@@ -203,7 +203,7 @@ class RoomTypeListAPIView(generics.GenericAPIView):
 
 
 class RoomTypeDetailAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = RoomTypeSerializer
     def get(self, request, room_type_id):
         result = RoomTypeQuery.GetById(room_type_id)
@@ -211,7 +211,7 @@ class RoomTypeDetailAPIView(generics.GenericAPIView):
 
 
 class RoomTypeDeleteAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = RoomTypeSerializer
     def delete(self, request, room_type_id):
         result = RoomTypeCommand.ToggleDelete(room_type_id, request.user)
@@ -219,7 +219,7 @@ class RoomTypeDeleteAPIView(generics.GenericAPIView):
 
 
 class RoomCreateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = RoomSerializer
     def post(self, request):
         result = RoomCommand.Create(request.data, request.user)
@@ -227,7 +227,7 @@ class RoomCreateAPIView(generics.GenericAPIView):
 
 
 class RoomUpdateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = RoomSerializer
     def put(self, request, room_id):
         result = RoomCommand.Update(room_id, request.data, request.user)
@@ -235,7 +235,7 @@ class RoomUpdateAPIView(generics.GenericAPIView):
 
 
 class RoomListAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = RoomSerializer
     def get(self, request):
         result = RoomQuery.GetAll()
@@ -243,7 +243,7 @@ class RoomListAPIView(generics.GenericAPIView):
 
 
 class RoomDetailAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = RoomSerializer
     def get(self, request, room_id):
         result = RoomQuery.GetById(room_id)
@@ -251,7 +251,7 @@ class RoomDetailAPIView(generics.GenericAPIView):
 
 
 class RoomDeleteAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = RoomSerializer
     def delete(self, request, room_id):
         result = RoomCommand.ToggleDelete(room_id, request.user)
@@ -260,7 +260,7 @@ class RoomDeleteAPIView(generics.GenericAPIView):
 
 # Guest Profile endpoints
 class GuestProfileCreateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = GuestProfileSerializer
     def post(self, request):
         result = GuestProfileCommand.Create(request.data, request.user)
@@ -268,7 +268,7 @@ class GuestProfileCreateAPIView(generics.GenericAPIView):
 
 
 class GuestProfileUpdateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = GuestProfileSerializer
     def put(self, request, guest_id):
         result = GuestProfileCommand.Update(guest_id, request.data, request.user)
@@ -276,7 +276,7 @@ class GuestProfileUpdateAPIView(generics.GenericAPIView):
 
 
 class GuestProfileListAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = GuestProfileSerializer
     def get(self, request):
         result = GuestProfileQuery.GetAll()
@@ -284,7 +284,7 @@ class GuestProfileListAPIView(generics.GenericAPIView):
 
 
 class GuestProfileDetailAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = GuestProfileSerializer
     def get(self, request, guest_id):
         result = GuestProfileQuery.GetById(guest_id)
@@ -292,7 +292,7 @@ class GuestProfileDetailAPIView(generics.GenericAPIView):
 
 
 class GuestProfileDeleteAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = GuestProfileSerializer
     def delete(self, request, guest_id):
         result = GuestProfileCommand.ToggleDelete(guest_id, request.user)
@@ -301,7 +301,7 @@ class GuestProfileDeleteAPIView(generics.GenericAPIView):
 
 # Booking endpoints
 class BookingCreateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = BookingSerializer
     
     def post(self, request):
@@ -310,7 +310,7 @@ class BookingCreateAPIView(generics.GenericAPIView):
 
 
 class BookingUpdateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = BookingSerializer
     
     def put(self, request, booking_id):
@@ -319,7 +319,7 @@ class BookingUpdateAPIView(generics.GenericAPIView):
 
 
 class BookingListAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = BookingSerializer
     
     def get(self, request):
@@ -328,7 +328,7 @@ class BookingListAPIView(generics.GenericAPIView):
 
 
 class BookingDetailAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = BookingSerializer
     
     def get(self, request, booking_id):
@@ -337,7 +337,7 @@ class BookingDetailAPIView(generics.GenericAPIView):
 
 
 class BookingToggleDeleteAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = BookingSerializer
     
     def delete(self, request, booking_id):
@@ -345,9 +345,18 @@ class BookingToggleDeleteAPIView(generics.GenericAPIView):
         return Response(result.to_dict(), status=result.status_code)
 
 
+class BookingCheckInAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
+    serializer_class = BookingSerializer
+    
+    def post(self, request, booking_id):
+        result = BookingCommand.CheckIn(booking_id, request.user)
+        return Response(result.to_dict(), status=result.status_code)
+
+
 # Invoice endpoints
 class InvoiceCreateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = InvoiceSerializer
     
     def post(self, request):
@@ -356,7 +365,7 @@ class InvoiceCreateAPIView(generics.GenericAPIView):
 
 
 class InvoiceListAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = InvoiceSerializer
     
     def get(self, request):
@@ -365,7 +374,7 @@ class InvoiceListAPIView(generics.GenericAPIView):
 
 
 class InvoiceDetailAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = InvoiceSerializer
     
     def get(self, request, invoice_id):
@@ -375,7 +384,7 @@ class InvoiceDetailAPIView(generics.GenericAPIView):
 
 # Payment endpoints
 class PaymentListAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = PaymentSerializer
     
     def get(self, request):
@@ -384,7 +393,7 @@ class PaymentListAPIView(generics.GenericAPIView):
 
 
 class PaymentDetailAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = PaymentSerializer
     
     def get(self, request, payment_id):
@@ -393,7 +402,7 @@ class PaymentDetailAPIView(generics.GenericAPIView):
 
 
 class PaymentUpdateStatusAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = PaymentSerializer
     
     def put(self, request, payment_id):
@@ -402,7 +411,7 @@ class PaymentUpdateStatusAPIView(generics.GenericAPIView):
 
 
 class PaymentToggleDeleteAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = PaymentSerializer
     
     def delete(self, request, payment_id):
@@ -412,7 +421,7 @@ class PaymentToggleDeleteAPIView(generics.GenericAPIView):
 
 # Report endpoints
 class OccupancyReportAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     
     def get(self, request):
         date = request.query_params.get('date', None)
@@ -421,7 +430,7 @@ class OccupancyReportAPIView(generics.GenericAPIView):
 
 
 class RevenueReportAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     
     def get(self, request):
         date = request.query_params.get('date', None)
@@ -430,7 +439,7 @@ class RevenueReportAPIView(generics.GenericAPIView):
 
 
 class SalesReportAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     
     def get(self, request):
         date = request.query_params.get('date', None)
@@ -439,7 +448,7 @@ class SalesReportAPIView(generics.GenericAPIView):
 
 
 class ExportReportAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     
     def get(self, request):
         date = request.query_params.get('date', None)

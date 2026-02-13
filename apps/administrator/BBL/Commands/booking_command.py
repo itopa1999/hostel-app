@@ -498,4 +498,104 @@ class BookingCommand:
                 data=None,
                 status_code=HTTPStatus.BAD_REQUEST,
                 message=str(e)
+            )    
+    @staticmethod
+    def CheckIn(booking_id, user=None):
+        """Check in a guest - updates booking status to CHECKED_IN and room to OCCUPIED"""
+        op = OperationLogger("BookingCommand.CheckIn", booking_id=booking_id)
+        op.start()
+        
+        try:
+            booking = Booking.objects.get(id=booking_id)
+        except Booking.DoesNotExist:
+            op.fail(f"Booking with id {booking_id} not found")
+            return BaseResultWithData(
+                data=None,
+                status_code=HTTPStatus.NOT_FOUND,
+                message="Booking not found"
+            )
+        
+        if booking.is_deleted:
+            op.fail(f"Booking {booking.confirmation_code} is deleted")
+            return BaseResultWithData(
+                data=None,
+                status_code=HTTPStatus.BAD_REQUEST,
+                message="This booking is deleted and cannot be used for check-in"
+            )
+        
+        try:
+            from datetime import date
+            from utils.enums import BookingStatus, PaymentStatus, RoomStatus
+            from apps.hostel.models import Room
+            
+            # Validation checks
+            today = date.today()
+            
+            # Check 1: Invoice payment status must be COMPLETED
+            invoice = booking.invoice
+            if invoice.payment_status != PaymentStatus.COMPLETED.value:
+                op.fail(f"Invoice {invoice.invoice_number} payment status is {invoice.payment_status}, not COMPLETED")
+                return BaseResultWithData(
+                    data=None,
+                    status_code=HTTPStatus.BAD_REQUEST,
+                    message=f"Payment must be completed before check-in. Current status: {invoice.payment_status}"
+                )
+            
+            # Check 2: Check-in date must be within booking date range (check_in <= today <= check_out)
+            if booking.check_in > today:
+                op.fail(f"Check-in date {booking.check_in} is in the future, cannot check in yet")
+                return BaseResultWithData(
+                    data=None,
+                    status_code=HTTPStatus.BAD_REQUEST,
+                    message=f"Guest check-in date is {booking.check_in}, cannot check in before that date"
+                )
+            
+            if booking.check_out < today:
+                op.fail(f"Check-out date {booking.check_out} has already passed, cannot check in after checkout")
+                return BaseResultWithData(
+                    data=None,
+                    status_code=HTTPStatus.BAD_REQUEST,
+                    message=f"Guest check-out date was {booking.check_out}, cannot check in after checkout date"
+                )
+            
+            # Check 3: Room must be AVAILABLE
+            room = booking.room
+            if room.status != RoomStatus.AVAILABLE.value:
+                op.fail(f"Room {room.number} status is {room.status}, not AVAILABLE")
+                return BaseResultWithData(
+                    data=None,
+                    status_code=HTTPStatus.BAD_REQUEST,
+                    message=f"Room is not available (current status: {room.status}). Please select an available room or resolve the room status."
+                )
+            
+            # All checks passed - proceed with check-in
+            booking.status = BookingStatus.CHECKED_IN.value
+            booking.save()
+            op.success(f"Booking {booking.confirmation_code} status updated to CHECKED_IN")
+            
+            # Update room to OCCUPIED
+            room.status = RoomStatus.OCCUPIED.value
+            room.save()
+            op.success(f"Room {room.number} status updated to OCCUPIED")
+            
+            AuditLogger.log_update(
+                Booking.__name__,
+                performed_by=user,
+                old_values={"status": BookingStatus.RESERVED.value},
+                new_values={"status": BookingStatus.CHECKED_IN.value},
+                metadata=serialize_for_audit({"room_id": room.id, "invoice_id": invoice.id})
+            )
+            
+            result_serializer = BookingSerializer(booking)
+            return BaseResultWithData(
+                data=result_serializer.data,
+                status_code=HTTPStatus.OK,
+                message="Guest checked in successfully"
+            )
+        except Exception as e:
+            op.fail(f"Failed to check in guest: {str(e)}", exc=e)
+            return BaseResultWithData(
+                data=None,
+                status_code=HTTPStatus.BAD_REQUEST,
+                message=str(e)
             )

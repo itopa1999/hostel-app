@@ -160,9 +160,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     let redirectUrl = null;
                     
                     if (selectedGroupName === 'admin') {
-                        redirectUrl = 'admin_dashboard.html';
+                        redirectUrl = 'dashboard.html';
                     } else if (selectedGroupName === 'staff') {
-                        redirectUrl = 'staff_dashboard.html';
+                        redirectUrl = 'dashboard.html';
                     } else {
                         // Unknown group
                         CookieManager.clearUserSession();

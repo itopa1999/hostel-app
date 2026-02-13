@@ -6,6 +6,7 @@ from apps.users.BBL.Commands.user_command import UserCommand as UserCommand
 from apps.users.BBL.Queries.user_command import UserCommand as UserQueryCommand
 from apps.users.BBL.Queries.group_command import GroupQuery
 from apps.users.serializers import ChangePasswordSerializer, LoginSerializer, UserDetailSerializer
+from utils.permissions import IsAdminPermission, IsAuthenticatedAndNotDeleted
 
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -30,10 +31,10 @@ class LoginViewAPI(generics.GenericAPIView):
             request=request
         )
         
-        return Response(result.to_dict(), status=result.status_code)
+        return Response(result.to_dict(), status=result.status_code.value)
     
 class ChangePasswordViewAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = ChangePasswordSerializer
     
     def post(self, request, *args, **kwargs):
@@ -48,16 +49,16 @@ class ChangePasswordViewAPI(generics.GenericAPIView):
             performed_by=user
         )
         
-        return Response(result.to_dict(), status=result.status_code)
+        return Response(result.to_dict(), status=result.status_code.value)
     
     
 class UserDetailViewAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = UserDetailSerializer
     
     def get(self, request, *args, **kwargs):
         result = UserQueryCommand.Retrieve(user_id=self.request.user.id)
-        return Response(result.to_dict(), status=result.status_code)
+        return Response(result.to_dict(), status=result.status_code.value)
 
 
 class GroupListAPIView(APIView):
@@ -67,5 +68,42 @@ class GroupListAPIView(APIView):
     
     def get(self, request):
         result = GroupQuery.ListAll()
-        return Response(result.to_dict(), status=result.status_code)
+        return Response(result.to_dict(), status=result.status_code.value)
 
+
+class UserListAPIView(generics.GenericAPIView):
+    """List all users with groups and details"""
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
+    
+    def get(self, request):
+        result = UserQueryCommand.List()
+        return Response(result.to_dict(), status=result.status_code.value)
+
+
+class UserDeleteAPIView(generics.GenericAPIView):
+    """Soft delete or restore a user"""
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
+    
+    def post(self, request, user_id):
+        result = UserCommand.ToggleDelete(user_id=user_id, performed_by=request.user)
+        return Response(result.to_dict(), status=result.status_code.value)
+
+
+class UserUpdateGroupsAPIView(generics.GenericAPIView):
+    """Update user's groups and optionally password"""
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
+    
+    def post(self, request, user_id):
+        group_ids = request.data.get('groups', [])
+        password = request.data.get('password', None)
+        result = UserCommand.UpdateGroups(user_id=user_id, group_ids=group_ids, password=password, performed_by=request.user)
+        return Response(result.to_dict(), status=result.status_code.value)
+
+
+class UserCreateAPIView(APIView):
+    """Create new user"""
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
+    
+    def post(self, request):
+        result = UserCommand.Create(request.data, performed_by=request.user)
+        return Response(result.to_dict(), status=result.status_code.value)

@@ -17,19 +17,23 @@ class IsOwnerOrReadOnly(BasePermission):
         return obj.user == request.user
 
 
-class IsRiderPermission(BasePermission):
+class IsAuthenticatedAndNotDeleted(BasePermission):
+    """
+    Custom permission to ensure user is authenticated and not deleted.
+    """
     message = "Access is not granted."
+    
     def has_permission(self, request, view):
         user = request.user
-
+        
         if not user.is_authenticated:
             return False
-
-        if not user.groups.filter(name='Rider').exists():
+        
+        if user.is_deleted:
             return False
-
+        
         return True
-    
+
 
 class IsAdminPermission(BasePermission):
     message = "Access is not granted."
@@ -39,22 +43,10 @@ class IsAdminPermission(BasePermission):
         if not user.is_authenticated:
             return False
 
+        if user.is_deleted:
+            return False
+
         if not user.groups.filter(name=GroupNames.ADMIN.value).exists():
-            return False
-
-        return True
-    
-    
-
-class IsCustomerPermission(BasePermission):
-    message = "Access is not granted."
-    def has_permission(self, request, view):
-        user = request.user
-
-        if not user.is_authenticated:
-            return False
-
-        if not user.groups.filter(name='Customer').exists():
             return False
 
         return True

@@ -86,6 +86,7 @@ urlpatterns = [
                 path("<int:booking_id>/", BookingDetailAPIView.as_view(), name='booking-detail'),
                 path("<int:booking_id>/update/", BookingUpdateAPIView.as_view(), name='booking-update'),
                 path("<int:booking_id>/delete/", BookingToggleDeleteAPIView.as_view(), name='booking-delete'),
+                path("<int:booking_id>/check-in/", BookingCheckInAPIView.as_view(), name='booking-check-in'),
             ]
         )
     ),

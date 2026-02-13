@@ -43,9 +43,7 @@ function formatPercentage(value) {
 async function generateAndDisplayOccupancyReport() {
     const date = getSelectedDate();
     
-    try {
-        showModal('Generating Occupancy Report...', 'info');
-        
+    try {        
         const response = await APIInterceptor.fetch(`${ADMIN_URL}reports/occupancy/?date=${date}`, {
             method: 'GET',
             headers: {
@@ -123,7 +121,6 @@ async function generateAndDisplayRevenueReport() {
     const date = getSelectedDate();
     
     try {
-        showModal('Generating Revenue Report...', 'info');
         
         const response = await APIInterceptor.fetch(`${ADMIN_URL}reports/revenue/?date=${date}`, {
             method: 'GET',
@@ -170,26 +167,26 @@ function displayRevenueReport(report) {
             <h3 style="margin-bottom: 1rem; color: var(--primary);">💰 Revenue Report</h3>
             <p style="color: var(--text-muted); margin-bottom: 1rem;">Report Date: <strong>${report.report_date}</strong></p>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                 <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Completed Bookings</p>
                     <p style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">${report.total_completed_bookings}</p>
                 </div>
                 <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Subtotal</p>
-                    <p style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">${formatCurrency(report.total_subtotal)}</p>
+                    <p style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); word-break: break-word;">${formatCurrency(report.total_subtotal)}</p>
                 </div>
                 <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Discount</p>
-                    <p style="font-size: 1.2rem; font-weight: 700; color: #ff6b6b;">-${formatCurrency(report.total_discount)}</p>
+                    <p style="font-size: 1.1rem; font-weight: 700; color: #ff6b6b; word-break: break-word;">-${formatCurrency(report.total_discount)}</p>
                 </div>
                 <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Tax</p>
-                    <p style="font-size: 1.2rem; font-weight: 700; color: #4caf50;">+${formatCurrency(report.total_tax)}</p>
+                    <p style="font-size: 1.1rem; font-weight: 700; color: #4caf50; word-break: break-word;">+${formatCurrency(report.total_tax)}</p>
                 </div>
-                <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); padding: 1rem; border-radius: 8px; text-align: center; color: white;">
+                <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); padding: 1rem; border-radius: 8px; text-align: center; color: white; grid-column: auto;">
                     <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Total Revenue</p>
-                    <p style="font-size: 1.8rem; font-weight: 700;">${formatCurrency(report.total_revenue)}</p>
+                    <p style="font-size: 1.3rem; font-weight: 700; word-break: break-word;">${formatCurrency(report.total_revenue)}</p>
                 </div>
             </div>
             
@@ -206,7 +203,6 @@ async function generateAndDisplaySalesReport() {
     const date = getSelectedDate();
     
     try {
-        showModal('Generating Sales Report...', 'info');
         
         const response = await APIInterceptor.fetch(`${ADMIN_URL}reports/sales/?date=${date}`, {
             method: 'GET',
@@ -274,7 +270,7 @@ function displaySalesReport(report) {
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Completed Payments</p>
                     <p style="font-size: 1.8rem; font-weight: 700; color: #4caf50;">${report.completed_payments}</p>
                 </div>
-                <div style="background: linear-gradient(135deg, var(--success) 0%, #4caf50 100%); padding: 1rem; border-radius: 8px; text-align: center; color: white; grid-column: span 2;">
+                <div style="background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); padding: 1rem; border-radius: 8px; text-align: center; color: white; grid-column: span 2;">
                     <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Total Sales</p>
                     <p style="font-size: 1.8rem; font-weight: 700;">${formatCurrency(report.total_sales)}</p>
                 </div>
@@ -298,7 +294,6 @@ async function generateAndDisplayExportReport() {
     const date = getSelectedDate();
     
     try {
-        showModal('Generating Export Report...', 'info');
         
         const response = await APIInterceptor.fetch(`${ADMIN_URL}reports/export/?date=${date}`, {
             method: 'GET',

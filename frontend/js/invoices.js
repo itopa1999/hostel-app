@@ -196,6 +196,13 @@ function displayInvoicesAsRows(invoices) {
                 <button class="icon-btn print-invoice-btn" title="Print" onclick="printInvoice(${invoice.id})">
                     <i class="fas fa-print"></i>
                 </button>
+                ${invoice.payment_status === 'COMPLETED' && invoice.check_in && invoice.check_out && 
+                  new Date(invoice.check_in) <= new Date(invoice.today) && 
+                  new Date(invoice.today) <= new Date(invoice.check_out) ? `
+                <button class="icon-btn check-in-btn" title="Check In Guest" onclick="checkInGuest(${invoice.booking})">
+                    <i class="fas fa-door-open"></i>
+                </button>
+                ` : ''}
             </div>
         </div>
     `).join('');
@@ -573,4 +580,33 @@ function searchInvoices(e) {
     );
     
     displayInvoicesAsRows(filteredInvoices);
+}
+
+async function checkInGuest(bookingId) {
+    if (!bookingId) {
+        showModal('Booking not found', 'fail');
+        return;
+    }
+    
+    try {        
+        const response = await APIInterceptor.fetch(`${ADMIN_URL}booking/${bookingId}/check-in/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.is_success) {
+            showModal('Guest checked in successfully!', 'success');
+            loadInvoices();  // Refresh the list
+        } else {
+            showModal(data.message || 'Failed to check in guest.', 'fail');
+        }
+    } catch (error) {
+        console.error('Error checking in guest:', error);
+        showModal('Error processing check-in. Please try again.', 'fail');
+    }
 }

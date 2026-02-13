@@ -18,9 +18,6 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'full_name',
             'id_number',
-            'is_active',
-            'is_staff',
-            'is_superuser',
             'is_deleted',
             'groups',
         ]
@@ -75,9 +72,6 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             'email',
             'first_name',
             'last_name',
-            'is_active',
-            'is_staff',
-            'is_superuser',
             'password',
             'groups',
         ]

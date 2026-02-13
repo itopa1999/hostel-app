@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/staff.css">
 </head>
 <body>
     <div class="bg-animation">
@@ -77,37 +78,109 @@
                 <div class="card full-width">
                     <div class="card-header">
                         <h2>All Staff</h2>
-                        <button class="action-btn" style="padding: 0.6rem 1.2rem; gap: 0.5rem;">
-                            <i class="fas fa-plus-circle"></i>
-                            <span>Add Staff</span>
-                        </button>
+                        <div class="card-header-actions">
+                            <div class="search-box-inline">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="staffSearchInput" placeholder="Search staff by name, email, phone...">
+                            </div>
+                            <button class="action-btn create-staff-btn" style="padding: 0.6rem 1.2rem; gap: 0.5rem;" id="addStaffBtn">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Add Staff</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <div class="table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Position</th>
-                                        <th>Department</th>
-                                        <th>Status</th>
-                                        <th>Hire Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="staff-tbody">
-                                    <tr>
-                                        <td colspan="7" style="text-align: center; padding: 2rem;">Loading staff...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="staff-container" id="staffContainer">
+                            <div style="text-align: center; padding: 2rem; color: #666;">Loading staff...</div>
                         </div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
+
+    <!-- Change Group Modal -->
+    <div class="modal" id="changeGroupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Manage Groups</h2>
+                <button class="modal-close" id="closeChangeGroupModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelChangeGroupBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveChangeGroupBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Staff Modal -->
+    <div class="modal" id="createStaffModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Staff Member</h2>
+                <button class="modal-close" id="closeCreateStaffModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createStaffForm">
+                    <div class="form-group">
+                        <label for="username">Username *</label>
+                        <input type="text" id="username" name="username" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password *</label>
+                        <input type="password" id="password" name="password" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="first_name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="last_name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Groups</label>
+                        <div id="groupCheckboxes"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeCreateBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveStaffBtn">Create Staff</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Staff Modal -->
+    <div class="modal" id="deleteStaffModal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Delete Staff</h2>
+                <button class="modal-close" id="closeDeleteModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteMessage">Are you sure you want to delete this staff member?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/main.js"></script>
     <script src="js/staff.js"></script>
 </body>

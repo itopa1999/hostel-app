@@ -479,6 +479,16 @@
     transform: scale(1.1);
 }
 
+.check-in-btn {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+}
+
+.check-in-btn:hover {
+    background: rgba(76, 175, 80, 0.2);
+    transform: scale(1.1);
+}
+
 .icon-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;

@@ -34,7 +34,7 @@ if (themeToggle) {
 
 // Navigation items structure
 const navItems = [
-    { href: 'admin_dashboard.html', icon: 'fa-home', label: 'Dashboard' },
+    { href: 'dashboard.html', icon: 'fa-home', label: 'Dashboard' },
     { href: 'hotels.html', icon: 'fa-building', label: 'Hotels' },
     { href: 'floors.html', icon: 'fa-layer-group', label: 'Floors' },
     { href: 'room-types.html', icon: 'fa-door-open', label: 'Room Types' },
@@ -48,10 +48,32 @@ const navItems = [
     { href: 'settings.html', icon: 'fa-cogs', label: 'Settings' }
 ];
 
+// Get filtered nav items based on user group
+function getFilteredNavItems() {
+    const userGroup = CookieManager.get('user_group');
+    
+    // If no user group or admin, show all items
+    if (!userGroup || userGroup === 'Admin') {
+        return navItems;
+    }
+    
+    // For staff, exclude hotels, staff, and settings
+    if (userGroup === 'Staff') {
+        return navItems.filter(item => 
+            item.href !== 'hotels.html' && 
+            item.href !== 'staff.html' && 
+            item.href !== 'settings.html'
+        );
+    }
+    
+    // For other roles, show all items
+    return navItems;
+}
+
 // Get current page filename
 function getCurrentPage() {
     const href = window.location.href;
-    const filename = href.substring(href.lastIndexOf('/') + 1) || 'admin_dashboard.html';
+    const filename = href.substring(href.lastIndexOf('/') + 1) || 'dashboard.html';
     return filename;
 }
 
@@ -61,10 +83,11 @@ function initSidebarNav() {
     if (!sidebarNav) return;
     
     const currentPage = getCurrentPage();
+    const filteredItems = getFilteredNavItems();
     
     // Generate navigation HTML
     let navHTML = '';
-    navItems.forEach(item => {
+    filteredItems.forEach(item => {
         const isActive = item.href === currentPage ? ' active' : '';
         navHTML += `
             <a href="${item.href}" class="nav-item${isActive}">
@@ -194,6 +217,10 @@ const CookieManager = {
         this.delete('is_superuser');
         this.delete('user_group');
         this.delete('group_id');
+        this.delete('csrftoken');
+        this.delete('group');
+        this.delete('name');
+        this.delete('refresh');
     }
 };
 
@@ -366,10 +393,16 @@ function showModal(message, type = 'info', redirectUrl = null, duration = 3000) 
 
 
 const username = CookieManager.get('admin_username')
-const userSpan = document.getElementById('user');
+const userGroup = CookieManager.get('user_group')
+const userSpan = document.querySelector('profile-name');
+const userRoleSpan = document.querySelector('.profile-role');
 
 if (username && userSpan) {
     userSpan.innerHTML = username;
+}
+
+if (userGroup && userRoleSpan) {
+    userRoleSpan.innerHTML = userGroup;
 }
 
 const USER_URL = "http://127.0.0.1:8000/auth/api/user/";
@@ -415,7 +448,7 @@ const APIInterceptor = {
     },
     
     getReturnUrl: function() {
-        return sessionStorage.getItem('returnUrl') || 'admin_dashboard.html';
+        return sessionStorage.getItem('returnUrl') || 'dashboard.html';
     },
     
     clearReturnUrl: function() {
