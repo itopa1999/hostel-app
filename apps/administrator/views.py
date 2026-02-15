@@ -13,6 +13,8 @@ from apps.administrator.BBL.Commands.booking_command import BookingCommand
 from apps.administrator.BBL.Commands.invoice_command import InvoiceCommand
 from apps.administrator.BBL.Commands.payment_command import PaymentCommand
 from apps.hostel.BBL.Commands.report_command import ReportCommand
+from apps.hostel.BBL.Commands.setting_command import SettingCommand as SettingCommandClass
+from apps.hostel.BBL.Queries.setting_query import SettingQuery
 from apps.administrator.serializers import *
 from apps.hostel.BBL.Queries.dashboard_query import DashboardQuery
 from apps.hostel.BBL.Queries.hotel_query import HotelQuery
@@ -23,7 +25,7 @@ from apps.hostel.BBL.Queries.guest_profile_query import GuestProfileQuery
 from apps.hostel.BBL.Queries.booking_query import BookingQuery
 from apps.hostel.BBL.Queries.invoice_query import InvoiceQuery
 from apps.hostel.BBL.Queries.payment_query import PaymentQuery
-from apps.hostel.serializers import FloorSerializer, GuestProfileSerializer, RoomSerializer, RoomTypeSerializer, BookingSerializer, InvoiceSerializer, PaymentSerializer
+from apps.hostel.serializers import FloorSerializer, GuestProfileSerializer, RoomSerializer, RoomTypeSerializer, BookingSerializer, InvoiceSerializer, PaymentSerializer, SettingSerializer
 from utils.permissions import IsAdminPermission, IsAuthenticatedAndNotDeleted
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -53,46 +55,21 @@ class UserCreateViewAPI(generics.GenericAPIView):
 
 
 class ChangeUserPasswordViewAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = ChangeUserPasswordSerializer
     
     def post(self, request, *args, **kwargs):
-        user_id = request.data.get('user_id')
+        user_id = request.user.id
+        old_password = request.data.get('old_password')
         new_password = request.data.get('new_password')
         
         result = UserCommand.ChangePassword(
             user_id=user_id,
+            old_password=old_password,
             new_password=new_password,
             performed_by=request.user
         )
-        return Response(result.to_dict(), status=result.status_code)
-    
-    
-class UpdateUserViewAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
-    serializer_class = UserUpdateSerializer
-    
-    def put(self, request, user_id, *args, **kwargs):
-        user_id = user_id
-        username = request.data.get('username')
-        first_name = request.data.get('first_name')
-        last_name = request.data.get('last_name')
-        email = request.data.get('email')
-        is_active = request.data.get('is_active')
-        groups = request.data.get('groups', [])
-        
-        result = UserCommand.Update(
-            user_id=user_id,
-            username=username,
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            is_active=is_active,
-            groups=groups,
-            performed_by=request.user
-        )
-        
-        return Response(result.to_dict(), status=result.status_code)
+        return Response(result.to_dict(), status=result.status_code.value)
     
     
 class ToggleDeleteUserViewAPI(generics.GenericAPIView):
@@ -454,3 +431,16 @@ class ExportReportAPIView(generics.GenericAPIView):
         date = request.query_params.get('date', None)
         result = ReportCommand.GenerateExportReport(date)
         return Response(result.to_dict(), status=result.status_code)
+
+
+class SettingsAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
+    serializer_class = SettingSerializer
+    
+    def get(self, request):
+        result = SettingQuery.Get()
+        return Response(result.to_dict(), status=result.status_code.value)
+    
+    def put(self, request):
+        result = SettingCommandClass.Update(request.data, performed_by=request.user)
+        return Response(result.to_dict(), status=result.status_code.value)

@@ -33,6 +33,17 @@ class RoomSerializer(serializers.ModelSerializer):
         model = Room
         fields = ['id', 'floor', 'floor_number', 'room_type', 'room_type_name', 'max_occupancy', 'base_price', 'number', 'status', 'price_override', 'notes', 'created_at', 'modified_at', 'is_deleted']
         read_only_fields = ['id', 'created_at', 'modified_at', 'is_deleted']
+    
+    def update(self, instance, validated_data):
+        """Prevent updating room if it's in occupied status"""
+        from utils.enums import RoomStatus
+        
+        if instance.status == RoomStatus.OCCUPIED.value:
+            raise serializers.ValidationError(
+                "Cannot update room while it is in occupied status. Please change the room status first."
+            )
+        
+        return super().update(instance, validated_data)
 
 
 class GuestProfileSerializer(serializers.ModelSerializer):

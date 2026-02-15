@@ -2,12 +2,17 @@
 let accessToken = null;
 let allPayments = [];
 let currentPaymentId = null;
+let userRole = null;
+let isAdmin = false;
 
 if (typeof CookieManager === 'undefined') {
     console.error('CookieManager not found. Make sure main.js is loaded before payments.js');
     window.location.href = "auth.html";
 } else {
     accessToken = CookieManager.get("access_token");
+    userRole = CookieManager.get("user_group");
+    isAdmin = !userRole || userRole === 'Admin';
+    
     if (!accessToken) {
         window.location.href = "auth.html";
     }
@@ -178,9 +183,11 @@ function displayPaymentsAsCards(payments) {
                 <button class="icon-btn edit-payment-btn" title="Edit" onclick="openEditModal(${payment.id})" ${payment.is_deleted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                     <i class="fas fa-edit"></i>
                 </button>
+                ${isAdmin ? `
                 <button class="icon-btn ${payment.is_deleted ? 'reactivate-payment-btn' : 'delete-payment-btn'}" title="${payment.is_deleted ? 'Reactivate' : 'Delete'}" onclick="openDeleteModal(${payment.id})">
                     <i class="fas fa-${payment.is_deleted ? 'undo' : 'trash'}"></i>
                 </button>
+                ` : ''}
             </div>
         </div>
     `).join('');

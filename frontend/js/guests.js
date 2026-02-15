@@ -17,6 +17,12 @@ document.addEventListener('DOMContentLoaded', function() {
     hidePreloader();
     loadGuests();
     setupEventListeners();
+    
+    // Check if modal should be opened from dashboard quick action
+    if (sessionStorage.getItem('openNewGuestModal') === 'true') {
+        sessionStorage.removeItem('openNewGuestModal');
+        setTimeout(() => openCreateModal(), 500);
+    }
 });
 
 

@@ -9,7 +9,6 @@ urlpatterns = [
             [
                 path("create/", UserCreateViewAPI.as_view()),
                 path("change-password/", ChangeUserPasswordViewAPI.as_view()),
-                path("update/<int:user_id>/", UpdateUserViewAPI.as_view()),
                 path("delete/<int:user_id>/", ToggleDeleteUserViewAPI.as_view()),
             ]
         )
@@ -122,6 +121,15 @@ urlpatterns = [
                 path("revenue/", RevenueReportAPIView.as_view(), name='revenue-report'),
                 path("sales/", SalesReportAPIView.as_view(), name='sales-report'),
                 path("export/", ExportReportAPIView.as_view(), name='export-report'),
+            ]
+        )
+    ),
+    # Settings endpoints
+    path(
+        "settings/",
+        include(
+            [
+                path("general/", SettingsAPIView.as_view(), name='general-settings'),
             ]
         )
     ),

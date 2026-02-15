@@ -2,12 +2,17 @@
 let accessToken = null;
 let allFloors = [];
 let currentFloorId = null;
+let userRole = null;
+let isAdmin = false;
 
 if (typeof CookieManager === 'undefined') {
     console.error('CookieManager not found. Make sure main.js is loaded before floors.js');
     window.location.href = "auth.html";
 } else {
     accessToken = CookieManager.get("access_token");
+    userRole = CookieManager.get("user_group");
+    isAdmin = !userRole || userRole === 'Admin';
+    
     if (!accessToken) {
         window.location.href = "auth.html";
     }
@@ -17,9 +22,19 @@ document.addEventListener('DOMContentLoaded', function() {
     hidePreloader();
     loadFloors();
     setupEventListeners();
+    setupRoleBasedAccess();
 });
 
 
+
+function setupRoleBasedAccess() {
+    const createFloorBtn = document.getElementById('createFloorBtn');
+    
+    // Hide add floor button for non-admin users
+    if (!isAdmin && createFloorBtn) {
+        createFloorBtn.style.display = 'none';
+    }
+}
 
 function setupEventListeners() {
     // Create button
@@ -90,12 +105,14 @@ function displayFloorsAsCards(floors) {
             <div class="floor-card-header">
                 <div class="floor-number">Floor ${floor.number} ${floor.is_deleted ? '<span style="color: #ff6b6b; font-size: 0.8em; margin-left: 0.5rem;">(Deleted)</span>' : ''}</div>
                 <div class="floor-actions">
+                    ${isAdmin ? `
                     <button class="icon-btn edit-floor-btn" title="Edit" data-id="${floor.id}" onclick="openEditModal(${floor.id})" ${floor.is_deleted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                         <i class="fas fa-edit"></i>
                     </button>
                     <button class="icon-btn ${floor.is_deleted ? 'reactivate-floor-btn' : 'delete-floor-btn'}" title="${floor.is_deleted ? 'Reactivate' : 'Delete'}" data-id="${floor.id}" onclick="openDeleteModal(${floor.id})">
                         <i class="fas fa-${floor.is_deleted ? 'undo' : 'trash'}"></i>
                     </button>
+                    ` : ''}
                 </div>
             </div>
             <div class="floor-card-body">

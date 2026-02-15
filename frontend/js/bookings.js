@@ -4,12 +4,17 @@ let allBookings = [];
 let allGuests = [];
 let allRooms = [];
 let currentBookingId = null;
+let userRole = null;
+let isAdmin = false;
 
 if (typeof CookieManager === 'undefined') {
     console.error('CookieManager not found. Make sure main.js is loaded before bookings.js');
     window.location.href = "auth.html";
 } else {
     accessToken = CookieManager.get("access_token");
+    userRole = CookieManager.get("user_group");
+    isAdmin = !userRole || userRole === 'Admin';
+    
     if (!accessToken) {
         window.location.href = "auth.html";
     }
@@ -20,6 +25,12 @@ document.addEventListener('DOMContentLoaded', function() {
     loadGuestsAndRooms();
     loadBookings();
     setupEventListeners();
+    
+    // Check if modal should be opened from dashboard quick action
+    if (sessionStorage.getItem('openNewBookingModal') === 'true') {
+        sessionStorage.removeItem('openNewBookingModal');
+        setTimeout(() => openCreateModal(), 500);
+    }
 });
 
 function setupEventListeners() {
@@ -174,9 +185,11 @@ function displayBookingsAsCards(bookings) {
                     <button class="icon-btn edit-booking-btn" title="Edit" data-id="${booking.id}" onclick="openEditModal(${booking.id})" ${booking.is_deleted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                         <i class="fas fa-edit"></i>
                     </button>
+                    ${isAdmin ? `
                     <button class="icon-btn ${booking.is_deleted ? 'reactivate-booking-btn' : 'delete-booking-btn'}" title="${booking.is_deleted ? 'Reactivate' : 'Delete'}" data-id="${booking.id}" onclick="openDeleteModal(${booking.id})">
                         <i class="fas fa-${booking.is_deleted ? 'undo' : 'trash'}"></i>
                     </button>
+                    ` : ''}
                 </div>
             </div>
             <div class="booking-card-body">

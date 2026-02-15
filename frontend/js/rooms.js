@@ -4,12 +4,17 @@ let allRooms = [];
 let allFloors = [];
 let allRoomTypes = [];
 let currentRoomId = null;
+let userRole = null;
+let isAdmin = false;
 
 if (typeof CookieManager === 'undefined') {
     console.error('CookieManager not found. Make sure main.js is loaded before rooms.js');
     window.location.href = "auth.html";
 } else {
     accessToken = CookieManager.get("access_token");
+    userRole = CookieManager.get("user_group");
+    isAdmin = !userRole || userRole === 'Admin';
+    
     if (!accessToken) {
         window.location.href = "auth.html";
     }
@@ -20,9 +25,19 @@ document.addEventListener('DOMContentLoaded', function() {
     loadFloorsAndTypes();
     loadRooms();
     setupEventListeners();
+    setupRoleBasedAccess();
 });
 
 
+
+function setupRoleBasedAccess() {
+    const createRoomBtn = document.getElementById('createRoomBtn');
+    
+    // Hide add room button for non-admin users
+    if (!isAdmin && createRoomBtn) {
+        createRoomBtn.style.display = 'none';
+    }
+}
 
 function setupEventListeners() {
     // Create button
@@ -159,9 +174,11 @@ function displayRoomsAsCards(rooms) {
                     <button class="icon-btn edit-room-btn" title="Edit" data-id="${room.id}" onclick="openEditModal(${room.id})" ${room.is_deleted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                         <i class="fas fa-edit"></i>
                     </button>
+                    ${isAdmin ? `
                     <button class="icon-btn ${room.is_deleted ? 'reactivate-room-btn' : 'delete-room-btn'}" title="${room.is_deleted ? 'Reactivate' : 'Delete'}" data-id="${room.id}" onclick="openDeleteModal(${room.id})">
                         <i class="fas fa-${room.is_deleted ? 'undo' : 'trash'}"></i>
                     </button>
+                    ` : ''}
                 </div>
             </div>
             <div class="room-card-body">

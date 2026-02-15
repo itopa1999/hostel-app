@@ -10,6 +10,7 @@
     --text-muted: #718096;
     --input-bg: rgba(255, 255, 255, 0.95);
     --input-border: rgba(110, 68, 255, 0.1);
+    --border-color: rgba(110, 68, 255, 0.1);
     --input-text: #2d3748;
     --shadow: 0 10px 25px rgba(110, 68, 255, 0.15);
     --modal-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
@@ -33,6 +34,7 @@
     --text-muted: #a0aec0;
     --input-bg: rgba(0, 0, 0, 0.3);
     --input-border: rgba(110, 68, 255, 0.2);
+    --border-color: rgba(138, 99, 255, 0.4);
     --input-text: #e2e8f0;
     --shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     --modal-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);

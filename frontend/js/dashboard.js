@@ -13,8 +13,40 @@ if (typeof CookieManager === 'undefined') {
 
 document.addEventListener('DOMContentLoaded', function() {
     loadDashboardMetrics();
+    setupQuickActionButtons();
     hidePreloader();
 });
+
+/**
+ * Setup quick action button click handlers
+ */
+function setupQuickActionButtons() {
+    const actionButtons = document.querySelectorAll('.action-btn');
+    
+    // New Booking button
+    if (actionButtons[0]) {
+        actionButtons[0].addEventListener('click', function() {
+            sessionStorage.setItem('openNewBookingModal', 'true');
+            window.location.href = 'bookings.html';
+        });
+    }
+    
+    // Add Guest button
+    if (actionButtons[1]) {
+        actionButtons[1].addEventListener('click', function() {
+            sessionStorage.setItem('openNewGuestModal', 'true');
+            window.location.href = 'guests.html';
+        });
+    }
+    
+    // Generate Report button
+    if (actionButtons[2]) {
+        actionButtons[2].addEventListener('click', function() {
+            sessionStorage.setItem('openReportModal', 'true');
+            window.location.href = 'reports.html';
+        });
+    }
+}
 async function loadDashboardMetrics() {
     try {        
         const response = await APIInterceptor.fetch(`${ADMIN_URL}hotel/dashboard/`, {

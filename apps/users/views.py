@@ -5,7 +5,7 @@ from apps.users.BBL.Commands.login_command import LoginCommand
 from apps.users.BBL.Commands.user_command import UserCommand as UserCommand
 from apps.users.BBL.Queries.user_command import UserCommand as UserQueryCommand
 from apps.users.BBL.Queries.group_command import GroupQuery
-from apps.users.serializers import ChangePasswordSerializer, LoginSerializer, UserDetailSerializer
+from apps.users.serializers import ChangePasswordSerializer, LoginSerializer, UserDetailSerializer, UserUpdateSerializer
 from utils.permissions import IsAdminPermission, IsAuthenticatedAndNotDeleted
 
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -58,6 +58,28 @@ class UserDetailViewAPI(generics.GenericAPIView):
     
     def get(self, request, *args, **kwargs):
         result = UserQueryCommand.Retrieve(user_id=self.request.user.id)
+        return Response(result.to_dict(), status=result.status_code.value)
+
+
+class UpdateUserViewAPI(generics.GenericAPIView):
+    permission_classes = [IsAuthenticatedAndNotDeleted]
+    serializer_class = UserUpdateSerializer
+    
+    def put(self, request, user_id=None, *args, **kwargs):
+        target_user_id = request.user.id
+        
+        email = request.data.get('email')
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
+        
+        result = UserCommand.Update(
+            user_id=target_user_id,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            performed_by=request.user
+        )
+        
         return Response(result.to_dict(), status=result.status_code.value)
 
 

@@ -14,6 +14,19 @@ if (typeof CookieManager === 'undefined') {
 document.addEventListener('DOMContentLoaded', function() {
     hidePreloader();
     initializeReportPage();
+    
+    // Check if report generator should be opened from dashboard quick action
+    if (sessionStorage.getItem('openReportModal') === 'true') {
+        sessionStorage.removeItem('openReportModal');
+        // Scroll to the report section or focus on date input
+        setTimeout(() => {
+            const reportDate = document.getElementById('reportDate');
+            if (reportDate) {
+                reportDate.focus();
+                reportDate.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 300);
+    }
 });
 
 function initializeReportPage() {

@@ -145,7 +145,7 @@ class UserCommand:
                 )
                 return BaseResultWithData(
                     message="Invalid old password",
-                    status_code=HTTPStatus.UNAUTHORIZED
+                    status_code=HTTPStatus.BAD_REQUEST
                 )
             
             # Check if new password is the same as old password
@@ -193,6 +193,114 @@ class UserCommand:
             return BaseResultWithData(
                 message="User not found",
                 status_code=HTTPStatus.NOT_FOUND
+            )
+    
+    @staticmethod
+    def Update(user_id, email=None, first_name=None, last_name=None, performed_by=None):
+        """
+        Update user profile information (email, first_name, last_name).
+        
+        Args:
+            user_id (int): User ID to update
+            email (str): New email address (optional)
+            first_name (str): New first name (optional)
+            last_name (str): New last name (optional)
+            performed_by (User): User performing the action
+            
+        Returns:
+            BaseResultWithData: Result with updated user data
+        """
+        op = OperationLogger("UserCommand.Update", user_id=user_id)
+        op.start()
+        
+        try:
+            user = User.objects.get(id=user_id, is_deleted=False)
+            
+            # Store old values for audit log
+            old_values = {}
+            new_values = {}
+            
+            # Check for duplicate email if being updated
+            if email is not None and email.strip() and email != user.email:
+                email_stripped = email.strip()
+                if User.objects.filter(email=email_stripped, is_deleted=False).exclude(id=user_id).exists():
+                    op.fail(f"Email {email_stripped} already exists")
+                    AuditLogger.log_failure(
+                        'UPDATE',
+                        'User',
+                        target_user=user,
+                        performed_by=performed_by,
+                        description=f"Failed to update user {user_id} - Email {email_stripped} already exists"
+                    )
+                    return BaseResultWithData(
+                        message="Email already exists",
+                        status_code=HTTPStatus.BAD_REQUEST
+                    )
+                old_values['email'] = user.email
+                new_values['email'] = email_stripped
+                user.email = email_stripped
+            
+            # Update first_name if provided
+            if first_name is not None:
+                first_name_stripped = first_name.strip() if first_name else ""
+                if first_name_stripped != user.first_name:
+                    old_values['first_name'] = user.first_name
+                    new_values['first_name'] = first_name_stripped
+                    user.first_name = first_name_stripped
+            
+            # Update last_name if provided
+            if last_name is not None:
+                last_name_stripped = last_name.strip() if last_name else ""
+                if last_name_stripped != user.last_name:
+                    old_values['last_name'] = user.last_name
+                    new_values['last_name'] = last_name_stripped
+                    user.last_name = last_name_stripped
+            
+            # Only save if there were changes
+            if old_values:
+                user.save()
+                op.success(f"User {user.username} profile updated successfully")
+                
+                AuditLogger.log_update(
+                    entity='User',
+                    target_user=user,
+                    performed_by=performed_by,
+                    description=f"Updated profile for user {user.username}",
+                    old_values=old_values,
+                    new_values=new_values
+                )
+            else:
+                op.success(f"No changes made to user {user.username}")
+            
+            serializer = UserDetailSerializer(user)
+            return BaseResultWithData(
+                message="User profile updated successfully",
+                data=serializer.data,
+                status_code=HTTPStatus.OK
+            )
+        except User.DoesNotExist:
+            op.fail("User not found")
+            AuditLogger.log_failure(
+                'UPDATE',
+                'User',
+                performed_by=performed_by,
+                description=f"Failed to update user {user_id} - User not found"
+            )
+            return BaseResultWithData(
+                message="User not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+        except Exception as e:
+            op.fail(f"Failed to update user: {str(e)}", exc=e)
+            AuditLogger.log_failure(
+                'UPDATE',
+                'User',
+                performed_by=performed_by,
+                description=f"Failed to update user {user_id} - {str(e)}"
+            )
+            return BaseResultWithData(
+                message=str(e),
+                status_code=HTTPStatus.BAD_REQUEST
             )
     
     @staticmethod
@@ -354,3 +462,6 @@ class UserCommand:
                 message=str(e),
                 status_code=HTTPStatus.BAD_REQUEST
             )
+
+
+

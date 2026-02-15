@@ -2,12 +2,17 @@
 let accessToken = null;
 let allRoomTypes = [];
 let currentRoomTypeId = null;
+let userRole = null;
+let isAdmin = false;
 
 if (typeof CookieManager === 'undefined') {
     console.error('CookieManager not found. Make sure main.js is loaded before room-types.js');
     window.location.href = "auth.html";
 } else {
     accessToken = CookieManager.get("access_token");
+    userRole = CookieManager.get("user_group");
+    isAdmin = !userRole || userRole === 'Admin';
+    
     if (!accessToken) {
         window.location.href = "auth.html";
     }
@@ -17,9 +22,19 @@ document.addEventListener('DOMContentLoaded', function() {
     hidePreloader();
     loadRoomTypes();
     setupEventListeners();
+    setupRoleBasedAccess();
 });
 
 
+
+function setupRoleBasedAccess() {
+    const createRoomTypeBtn = document.getElementById('createRoomTypeBtn');
+    
+    // Hide add room type button for non-admin users
+    if (!isAdmin && createRoomTypeBtn) {
+        createRoomTypeBtn.style.display = 'none';
+    }
+}
 
 function setupEventListeners() {
     // Create button
@@ -98,12 +113,14 @@ function displayRoomTypesAsCards(roomTypes) {
             <div class="room-type-card-header">
                 <div class="room-type-name">${type.name} ${type.is_deleted ? '<span style="color: #ff6b6b; font-size: 0.8em; margin-left: 0.5rem;">(Deleted)</span>' : ''}</div>
                 <div class="room-type-actions">
+                    ${isAdmin ? `
                     <button class="icon-btn edit-room-type-btn" title="Edit" data-id="${type.id}" onclick="openEditModal(${type.id})" ${type.is_deleted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                         <i class="fas fa-edit"></i>
                     </button>
                     <button class="icon-btn ${type.is_deleted ? 'reactivate-room-type-btn' : 'delete-room-type-btn'}" title="${type.is_deleted ? 'Reactivate' : 'Delete'}" data-id="${type.id}" onclick="openDeleteModal(${type.id})">
                         <i class="fas fa-${type.is_deleted ? 'undo' : 'trash'}"></i>
                     </button>
+                    ` : ''}
                 </div>
             </div>
             <div class="room-type-card-body">

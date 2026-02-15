@@ -61,8 +61,7 @@ function getFilteredNavItems() {
     if (userGroup === 'Staff') {
         return navItems.filter(item => 
             item.href !== 'hotels.html' && 
-            item.href !== 'staff.html' && 
-            item.href !== 'settings.html'
+            item.href !== 'staff.html'
         );
     }
     
