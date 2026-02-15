@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs - HotelOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+
+    <!-- Particle Effect -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-content">
+            <div class="loader"></div>
+            <div class="loader-content">
+                <h3>HotelOS Admin</h3>
+                <p>Loading audit logs...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h2>HotelOS</h2>
+                <button class="sidebar-collapse-btn" id="desktopSidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- Navigation items generated dynamically by main.js -->
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="profile-mini">
+                    <img src="" alt="pic" class="profile-avatar">
+                    <div class="profile-info">
+                        <p class="profile-name" id="user">Admin</p>
+                        <p class="profile-role">Administrator</p>
+                    </div>
+                </div>
+                <button class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-wrapper">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="mobileSidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb-wrapper">
+                        <span>Audit Logs</span>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Header Section -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h1>Audit Logs 📋</h1>
+                        <p style="color: var(--text-muted); margin-top: 0.5rem;">Track all system activities and changes</p>
+                    </div>
+                    <button class="btn btn-primary" id="filterDateBtn" style="padding: 0.75rem 1.5rem;">
+                        <i class="fas fa-calendar"></i> Filter by Date
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                    <div class="card" style="padding: 1.5rem; border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <small style="color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Total Records</small>
+                                <h3 id="totalCount" style="margin: 0; font-size: 1.8rem; color: var(--primary);">0</h3>
+                            </div>
+                            <i class="fas fa-list" style="font-size: 1.5rem; color: var(--primary); opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 1.5rem; border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <small style="color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Current Date Range</small>
+                                <p id="dateRangeDisplay" style="margin: 0; font-size: 0.95rem;">Today</p>
+                            </div>
+                            <i class="fas fa-calendar" style="font-size: 1.5rem; color: var(--secondary); opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Logs Table -->
+                <div class="card" style="border-radius: 12px; overflow: hidden;">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem 1rem; flex: 1; max-width: 400px;">
+                                <i class="fas fa-search" style="color: var(--text-muted); margin-right: 0.75rem;"></i>
+                                <input type="text" id="auditSearchInput" placeholder="Search by action, entity, or user..." style="background: transparent; border: none; outline: none; color: var(--text); width: 100%; font-family: 'Poppins', sans-serif;">
+                            </div>
+                            <small style="color: var(--text-muted); white-space: nowrap;">
+                                <i class="fas fa-filter"></i> Showing <span id="auditCount">0</span> logs
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background-color: var(--card-bg); border-bottom: 2px solid var(--border-color);">
+                                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Action</th>
+                                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Entity</th>
+                                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Status</th>
+                                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Performed By</th>
+                                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Target User</th>
+                                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Timestamp</th>
+                                    <th style="padding: 1rem; text-align: center; font-weight: 600;">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditTableBody">
+                                <tr>
+                                    <td colspan="7" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                                        <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-right: 0.5rem;"></i>
+                                        Loading audit logs...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/audit.js"></script>
+</body>
+</html>

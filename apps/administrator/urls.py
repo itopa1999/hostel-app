@@ -133,4 +133,26 @@ urlpatterns = [
             ]
         )
     ),
+    # Backup endpoints
+    path(
+        "backup/",
+        include(
+            [
+                path("create/", CreateBackupAPIView.as_view(), name='backup-create'),
+                path("list/", BackupListAPIView.as_view(), name='backup-list'),
+                path("<int:backup_id>/", BackupDetailAPIView.as_view(), name='backup-detail'),
+                path("<int:backup_id>/download/", DownloadBackupAPIView.as_view(), name='backup-download'),
+            ]
+        )
+    ),
+    # Audit Log endpoints
+    path(
+        "audit/",
+        include(
+            [
+                path("list/", AuditLogListAPIView.as_view(), name='audit-list'),
+                path("<int:audit_id>/", AuditLogDetailAPIView.as_view(), name='audit-detail'),
+            ]
+        )
+    ),
 ]

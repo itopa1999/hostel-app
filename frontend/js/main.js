@@ -45,6 +45,8 @@ const navItems = [
     { href: 'payments.html', icon: 'fa-credit-card', label: 'Payments' },
     { href: 'reports.html', icon: 'fa-chart-bar', label: 'Reports' },
     { href: 'staff.html', icon: 'fa-user-tie', label: 'Staff' },
+    { href: 'audit.html', icon: 'fa-clipboard-list', label: 'Audit Logs', adminOnly: true },
+    { href: 'backups.html', icon: 'fa-database', label: 'Backups', adminOnly: true },
     { href: 'settings.html', icon: 'fa-cogs', label: 'Settings' }
 ];
 
@@ -57,16 +59,17 @@ function getFilteredNavItems() {
         return navItems;
     }
     
-    // For staff, exclude hotels, staff, and settings
+    // For staff, exclude hotels, staff, settings, and admin-only items
     if (userGroup === 'Staff') {
         return navItems.filter(item => 
             item.href !== 'hotels.html' && 
-            item.href !== 'staff.html'
+            item.href !== 'staff.html' &&
+            !item.adminOnly
         );
     }
     
-    // For other roles, show all items
-    return navItems;
+    // For other roles, filter out admin-only items
+    return navItems.filter(item => !item.adminOnly);
 }
 
 // Get current page filename

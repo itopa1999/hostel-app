@@ -99,6 +99,51 @@ class CacheKeys(Enum):
     Centralized cache key names for consistency across the project.
     Always use CacheKeys.KEY_NAME.value when accessing cache.
     """
+    # Hotel Cache
+    HOTEL_FIRST = "hotel:first"
+    HOTEL_ALL = "hotel:all"
+    HOTEL_ID = "hotel:id:{hotel_id}"
+    
+    # Settings Cache
+    SETTINGS_GENERAL = "settings:general"
+    SETTINGS_ALL = "settings:all"
+    
+    # Room Cache
+    ROOM_ALL = "room:all"
+    ROOM_ID = "room:id:{room_id}"
+    ROOM_AVAILABLE = "room:available"
+    
+    # Floor Cache
+    FLOOR_ALL = "floor:all"
+    FLOOR_ID = "floor:id:{floor_id}"
+    
+    # Room Type Cache
+    ROOM_TYPE_ALL = "room_type:all"
+    ROOM_TYPE_ID = "room_type:id:{room_type_id}"
+    
+    # Booking Cache
+    BOOKING_ALL = "booking:all"
+    BOOKING_ID = "booking:id:{booking_id}"
+    
+    # Invoice Cache
+    INVOICE_ALL = "invoice:all"
+    INVOICE_ID = "invoice:id:{invoice_id}"
+    
+    # Payment Cache
+    PAYMENT_ALL = "payment:all"
+    PAYMENT_ID = "payment:id:{payment_id}"
+    
+    # Guest Profile Cache
+    GUEST_ALL = "guest:all"
+    GUEST_ID = "guest:id:{guest_id}"
+    
+    # Dashboard Cache
+    DASHBOARD_STATS = "dashboard:stats"
+    DASHBOARD_OCCUPANCY = "dashboard:occupancy"
+    
+    # User Cache
+    USER_PROFILE = "user:profile:{user_id}"
+    USER_ALL = "user:all"
 
     @classmethod
     def format(cls, key, **kwargs):

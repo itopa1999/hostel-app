@@ -58,7 +58,7 @@ function handleSettingClick(settingName) {
             openGeneralSettingsModal();
             break;
         case 'backup & restore':
-            showModal('Backup & restore feature coming soon!', 'info');
+            openBackupModal();
             break;
         case 'system information':
             showSystemInfo();
@@ -549,4 +549,130 @@ async function changePassword() {
     }
 }
 
+// Backup Modal Functions
+function openBackupModal() {
+    const existingModal = document.getElementById('backupModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Get today's date as default end date
+    const today = new Date();
+    const endDate = today.toISOString().split('T')[0];
+    
+    // Set start date to 7 days ago
+    const startDateObj = new Date(today);
+    startDateObj.setDate(startDateObj.getDate() - 7);
+    const startDate = startDateObj.toISOString().split('T')[0];
+    
+    const modal = document.createElement('div');
+    modal.id = 'backupModal';
+    modal.className = 'modal active';
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Create Backup</h2>
+                <button class="modal-close" id="closeBackupModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="backupForm">
+                    <div class="form-group">
+                        <label for="backupStartDate" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Start Date</label>
+                        <input type="date" id="backupStartDate" name="start_date" class="form-control" 
+                               value="${startDate}"
+                               style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;" required>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label for="backupEndDate" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">End Date</label>
+                        <input type="date" id="backupEndDate" name="end_date" class="form-control" 
+                               value="${endDate}"
+                               style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;" required>
+                    </div>
+                    <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">
+                        <i class="fas fa-info-circle"></i> Backup will include all records created within this date range
+                    </small>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelBackupBtn">Cancel</button>
+                <button class="btn btn-primary" id="startBackupBtn">
+                    <i class="fas fa-download"></i> Start Backup
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    document.getElementById('closeBackupModal').addEventListener('click', closeBackupModal);
+    document.getElementById('cancelBackupBtn').addEventListener('click', closeBackupModal);
+    document.getElementById('startBackupBtn').addEventListener('click', submitBackup);
+}
+
+function closeBackupModal() {
+    const modal = document.getElementById('backupModal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+async function submitBackup() {
+    const startDate = document.getElementById('backupStartDate').value;
+    const endDate = document.getElementById('backupEndDate').value;
+    
+    if (!startDate || !endDate) {
+        showModal('Please select both start and end dates', 'fail');
+        return;
+    }
+    
+    if (new Date(endDate) < new Date(startDate)) {
+        showModal('End date must be after start date', 'fail');
+        return;
+    }
+    
+    try {
+        const button = document.getElementById('startBackupBtn');
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        const response = await APIInterceptor.fetch(`${ADMIN_URL}backup/create/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({
+                start_date: startDate,
+                end_date: endDate
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.is_success) {
+            closeBackupModal();
+            showModal('Backup started successfully! Check the backup list for progress.', 'success');
+            // Optionally refresh backup list if it exists
+            if (typeof loadBackupList === 'function') {
+                loadBackupList();
+            }
+        } else {
+            showModal(result.message || 'Failed to start backup', 'fail');
+        }
+    } catch (error) {
+        console.error('Error starting backup:', error);
+        showModal('Error starting backup. Please try again.', 'fail');
+    } finally {
+        const button = document.getElementById('startBackupBtn');
+        if (button) {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-download"></i> Start Backup';
+        }
+    }
+}
 

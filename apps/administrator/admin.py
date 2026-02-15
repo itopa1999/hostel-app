@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from apps.administrator.models import AuditLog
+from apps.administrator.models import AuditLog, Backup
 
 
 @admin.register(AuditLog)
@@ -66,3 +66,52 @@ class AuditLogAdmin(admin.ModelAdmin):
             return format_html('<span style="color: orange;">●</span> Pending')
     status_display.short_description = 'Status'
 
+
+@admin.register(Backup)
+class BackupAdmin(admin.ModelAdmin):
+    """Custom admin for Backup records."""
+    list_display = ('backup_name', 'status_display', 'start_date', 'end_date', 'record_count', 'requested_by', 'created_at')
+    list_display_links = ('backup_name',)
+    search_fields = ('backup_name', 'requested_by__username', 'status')
+    list_filter = ('status', 'created_at', 'start_date', 'end_date')
+    readonly_fields = ('file_path', 'file_size', 'record_count', 'models_backed_up', 'error_message', 'created_at', 'modified_at')
+    ordering = ['-created_at']
+    date_hierarchy = 'created_at'
+    list_per_page = 50
+    
+    fieldsets = (
+        ('Backup Information', {
+            'fields': ('backup_name', 'status', 'requested_by')
+        }),
+        ('Date Range', {
+            'fields': ('start_date', 'end_date')
+        }),
+        ('File Details', {
+            'fields': ('file_path', 'file_size', 'record_count', 'models_backed_up'),
+            'classes': ('collapse',)
+        }),
+        ('Error Tracking', {
+            'fields': ('error_message',),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'modified_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def status_display(self, obj):
+        """Display status with color coding"""
+        colors = {
+            'pending': '#ffc107',
+            'processing': '#17a2b8',
+            'completed': '#28a745',
+            'failed': '#dc3545',
+        }
+        color = colors.get(obj.status, '#6c757d')
+        return format_html(
+            '<span style="color: {};">●</span> {}',
+            color,
+            obj.get_status_display()
+        )
+    status_display.short_description = 'Status'
