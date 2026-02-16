@@ -458,3 +458,44 @@
 [data-theme="dark"] .date-label {
     color: #cbd5e1;
 }
+
+/* View Details Button */
+.booking-actions .icon-btn[title="View Details"] {
+    background: rgba(102, 126, 234, 0.15);
+    color: #667eea;
+}
+
+.booking-actions .icon-btn[title="View Details"]:hover:not(:disabled) {
+    background: rgba(102, 126, 234, 0.25);
+    color: #667eea;
+    transform: scale(1.1);
+}
+
+/* Dark Mode Support for View Details */
+[data-theme="dark"] .booking-actions .icon-btn[title="View Details"] {
+    background: rgba(102, 126, 234, 0.2);
+    color: #a8c5ff;
+}
+
+[data-theme="dark"] .booking-actions .icon-btn[title="View Details"]:hover:not(:disabled) {
+    background: rgba(102, 126, 234, 0.35);
+    color: #c8deff;
+}
+
+@media (prefers-color-scheme: dark) {
+    .booking-actions .icon-btn[title="View Details"] {
+        background: rgba(102, 126, 234, 0.25);
+        color: #a8c5ff;
+    }
+
+    .booking-actions .icon-btn[title="View Details"]:hover:not(:disabled) {
+        background: rgba(102, 126, 234, 0.4);
+        color: #c8deff;
+    }
+}
+
+@media (max-width: 768px) {
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -127,6 +127,100 @@
                 </div>
             </div>
 
+            <!-- Details Modal -->
+            <div class="modal" id="detailsInvoiceModal">
+                <div class="modal-content modal-medium">
+                    <div class="modal-header">
+                        <h2>Invoice <span id="detailsInvoiceNumber">Details</span></h2>
+                        <button class="modal-close" id="closeDetailsModal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; font-weight: 600;">Invoice Number</label>
+                                <p id="detailsInvoiceNumberValue" style="font-size: 1rem; font-weight: 500;">N/A</p>
+                            </div>
+                            <div>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; font-weight: 600;">Guest Name</label>
+                                <p id="detailsGuestName" style="font-size: 1rem; font-weight: 500;">N/A</p>
+                            </div>
+                            <div>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; font-weight: 600;">Booking Code</label>
+                                <p id="detailsBookingConfirmation" style="font-size: 1rem; font-weight: 500;">N/A</p>
+                            </div>
+                            <div>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; font-weight: 600;">Payment Status</label>
+                                <p id="detailsPaymentStatus" style="font-size: 1rem; font-weight: 500;">N/A</p>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Stay Dates</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Check-in</label>
+                                    <p id="detailsCheckIn" style="font-size: 0.95rem;">N/A</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Check-out</label>
+                                    <p id="detailsCheckOut" style="font-size: 0.95rem;">N/A</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Number of Nights</label>
+                                    <p id="detailsNights" style="font-size: 0.95rem;">0</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Due Date</label>
+                                    <p id="detailsDueDate" style="font-size: 0.95rem;">N/A</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Billing Summary</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Subtotal</label>
+                                    <p id="detailsSubtotal" style="font-size: 0.95rem;">₦0</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Discount</label>
+                                    <p id="detailsDiscount" style="font-size: 0.95rem;">₦0</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Tax</label>
+                                    <p id="detailsTax" style="font-size: 0.95rem;">₦0</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--primary-color); font-size: 0.75rem; margin-bottom: 0.25rem; font-weight: 600;">Total</label>
+                                    <p id="detailsTotal" style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">₦0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="paymentDateSection" style="margin-bottom: 1.5rem; display: none;">
+                            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Payment Date</h3>
+                            <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Paid On</label>
+                                    <p id="detailsPaymentDate" style="font-size: 0.95rem;">N/A</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="notesSection" style="display: none;">
+                            <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; font-weight: 600;">Notes</label>
+                            <div id="detailsNotes" style="font-size: 0.95rem; line-height: 1.5;">N/A</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" id="closeDetailsModalBtn" onclick="closeDetailsModal()">Close</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Delete Confirmation Modal -->
             <div class="modal" id="deleteInvoiceModal">
                 <div class="modal-content modal-small">

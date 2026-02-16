@@ -131,6 +131,90 @@
                 </div>
             </div>
 
+            <!-- Payment Details Modal -->
+            <div class="modal" id="detailsPaymentModal">
+                <div class="modal-content modal-medium">
+                    <div class="modal-header">
+                        <h2>Payment Details</h2>
+                        <button class="modal-close" id="closeDetailsModal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="details-section">
+                            <h3 class="section-title">Basic Information</h3>
+                            <div class="detail-item">
+                                <span class="detail-label">Invoice Number:</span>
+                                <span class="detail-value" id="detailsInvoiceNumber">N/A</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Booking Code:</span>
+                                <span class="detail-value" id="detailsBookingCode">N/A</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status:</span>
+                                <span class="detail-value" id="detailsPaymentStatus">N/A</span>
+                            </div>
+                        </div>
+
+                        <div class="details-section">
+                            <h3 class="section-title">Payment Information</h3>
+                            <div class="detail-item">
+                                <span class="detail-label">Method:</span>
+                                <span class="detail-value" id="detailsPaymentMethod">N/A</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Amount:</span>
+                                <span class="detail-value" id="detailsAmount">N/A</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Transaction ID:</span>
+                                <span class="detail-value" id="detailsTransactionID">N/A</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Receipt Number:</span>
+                                <span class="detail-value" id="detailsReceiptNumber">N/A</span>
+                            </div>
+                        </div>
+
+                        <div class="details-section">
+                            <h3 class="section-title">Transaction Date</h3>
+                            <div class="detail-item">
+                                <span class="detail-label">Created:</span>
+                                <span class="detail-value" id="detailsCreatedDate">N/A</span>
+                            </div>
+                        </div>
+
+                        <div class="details-section" id="detailsReferenceSection" style="display: none;">
+                            <h3 class="section-title">Reference</h3>
+                            <div class="detail-item">
+                                <span class="detail-label">Reference:</span>
+                                <span class="detail-value" id="detailsReference">N/A</span>
+                            </div>
+                        </div>
+
+                        <div class="details-section" id="detailsRefundSection" style="display: none;">
+                            <h3 class="section-title">Refund Information</h3>
+                            <div class="detail-item">
+                                <span class="detail-label">Refund Amount:</span>
+                                <span class="detail-value" id="detailsRefundAmount">N/A</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Refund Date:</span>
+                                <span class="detail-value" id="detailsRefundDate">N/A</span>
+                            </div>
+                        </div>
+
+                        <div class="details-section" id="detailsNotesSection" style="display: none;">
+                            <h3 class="section-title">Notes</h3>
+                            <div class="detail-item">
+                                <span class="detail-value" id="detailsNotes">N/A</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Delete Confirmation Modal -->
             <div class="modal" id="deletePaymentModal">
                 <div class="modal-content modal-small">

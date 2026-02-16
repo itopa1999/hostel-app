@@ -4,6 +4,8 @@ from utils.log_helpers import OperationLogger
 from apps.users.models import User
 from apps.users.serializers import UserDetailSerializer
 from utils.audit.audit_logger import AuditLogger
+from utils.cache_helper import GlobalCache
+from utils.enums import CacheKeys
 
 
 class UserCommand:
@@ -20,12 +22,26 @@ class UserCommand:
         Returns:
             BaseResultWithData: Result with user details
         """
-        
         try:
+            # Try cache first
+            cache_key = CacheKeys.format(CacheKeys.USER_ID, user_id=user_id)
+            cached_data = GlobalCache.get(cache_key)
+            if cached_data:
+                return BaseResultWithData(
+                    message="User retrieved successfully (cached)",
+                    data=cached_data,
+                    status_code=HTTPStatus.OK
+                )
+            
             user = User.objects.get(id=user_id, is_deleted=False)
+            serialized_data = UserDetailSerializer(user).data
+            
+            # Cache the result
+            GlobalCache.set(cache_key, serialized_data)
+            
             return BaseResultWithData(
                 message="User retrieved successfully",
-                data=UserDetailSerializer(user).data,
+                data=serialized_data,
                 status_code=HTTPStatus.OK
             )
         except User.DoesNotExist:
@@ -46,12 +62,27 @@ class UserCommand:
         op.start()
         
         try:
+            # Try cache first
+            cached_data = GlobalCache.get(CacheKeys.USER_ALL.value)
+            if cached_data:
+                op.success("Users retrieved successfully (cached)")
+                return BaseResultWithData(
+                    message="Users retrieved successfully (cached)",
+                    data=cached_data,
+                    status_code=HTTPStatus.OK
+                )
+            
             users = User.objects.filter(is_superuser=False).all()
             serializer = UserDetailSerializer(users, many=True)
+            serialized_data = serializer.data
+            
+            # Cache the result
+            GlobalCache.set(CacheKeys.USER_ALL.value, serialized_data)
+            
             op.success(f"Retrieved {users.count()} users")
             return BaseResultWithData(
                 message="Users retrieved successfully",
-                data=serializer.data,
+                data=serialized_data,
                 status_code=HTTPStatus.OK
             )
         except Exception as e:

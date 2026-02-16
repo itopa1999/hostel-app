@@ -176,6 +176,83 @@
                 </div>
             </div>
 
+            <!-- Details Modal -->
+            <div class="modal" id="detailsBookingModal">
+                <div class="modal-content modal-medium">
+                    <div class="modal-header">
+                        <h2 id="detailsBookingCode">Booking Details</h2>
+                        <button class="modal-close" id="closeDetailsModal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; font-weight: 600;">Confirmation Code</label>
+                                <p id="detailsConfirmationCode" style="font-size: 1rem; font-weight: 500;">N/A</p>
+                            </div>
+                            <div>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; font-weight: 600;">Guest Name</label>
+                                <p id="detailsGuestName" style="font-size: 1rem; font-weight: 500;">N/A</p>
+                            </div>
+                            <div>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; font-weight: 600;">Room Number</label>
+                                <p id="detailsRoomNumber" style="font-size: 1rem; font-weight: 500;">N/A</p>
+                            </div>
+                            <div>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; font-weight: 600;">Room Type</label>
+                                <p id="detailsRoomType" style="font-size: 1rem; font-weight: 500;">N/A</p>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Stay Dates</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Check-in</label>
+                                    <p id="detailsCheckIn" style="font-size: 0.95rem;">N/A</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Check-out</label>
+                                    <p id="detailsCheckOut" style="font-size: 0.95rem;">N/A</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Number of Guests</label>
+                                    <p id="detailsNumberOfGuests" style="font-size: 0.95rem;">0</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Status</label>
+                                    <p id="detailsStatus" style="font-size: 0.95rem;">N/A</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Payment Information</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Payment Status</label>
+                                    <p id="detailsPaymentStatus" style="font-size: 0.95rem;">N/A</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="specialRequestsSection" style="margin-bottom: 1.5rem; display: none;">
+                            <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; font-weight: 600;">Special Requests</label>
+                            <div id="detailsSpecialRequests" style="font-size: 0.95rem; line-height: 1.5;">N/A</div>
+                        </div>
+
+                        <div id="cancellationSection" style="display: none;">
+                            <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; font-weight: 600;">Cancellation Reason</label>
+                            <div id="detailsCancellationReason" style="font-size: 0.95rem; line-height: 1.5;">N/A</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" id="closeDetailsModalBtn" onclick="closeDetailsModal()">Close</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Delete Confirmation Modal -->
             <div class="modal" id="deleteBookingModal">
                 <div class="modal-content modal-small">

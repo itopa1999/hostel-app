@@ -275,7 +275,7 @@ async function submitBackup() {
 
 async function downloadBackup(backupId, backupName) {
     try {
-        const response = await fetch(`${ADMIN_URL}backup/${backupId}/download/`, {
+        const response = await APIInterceptor.fetch(`${ADMIN_URL}backup/${backupId}/download/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`

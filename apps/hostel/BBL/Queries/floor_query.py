@@ -2,7 +2,8 @@ from http import HTTPStatus
 from apps.hostel.models import Floor, Room
 from apps.hostel.serializers import FloorSerializer
 from utils.base_result import BaseResultWithData
-from utils.enums import RoomStatus
+from utils.enums import RoomStatus, CacheKeys
+from utils.cache_helper import GlobalCache
 
 
 class FloorQuery:
@@ -10,6 +11,15 @@ class FloorQuery:
     @staticmethod
     def GetAll():
         try:
+            # Try cache first
+            cached_data = GlobalCache.get(CacheKeys.FLOOR_ALL.value)
+            if cached_data:
+                return BaseResultWithData(
+                    data=cached_data,
+                    status_code=HTTPStatus.OK,
+                    message="Floors retrieved successfully (cached)"
+                )
+            
             floors = Floor.objects.all()
             serializer = FloorSerializer(floors, many=True)
             
@@ -23,6 +33,9 @@ class FloorQuery:
                 ).count()
                 floor_data['total_rooms'] = total_rooms
                 floor_data['occupied_rooms'] = occupied_rooms
+            
+            # Cache the result
+            GlobalCache.set(CacheKeys.FLOOR_ALL.value, data)
             
             return BaseResultWithData(
                 data=data,
@@ -39,6 +52,16 @@ class FloorQuery:
     @staticmethod
     def GetById(floor_id):
         try:
+            # Try cache first
+            cache_key = CacheKeys.format(CacheKeys.FLOOR_ID, floor_id=floor_id)
+            cached_data = GlobalCache.get(cache_key)
+            if cached_data:
+                return BaseResultWithData(
+                    data=cached_data,
+                    status_code=HTTPStatus.OK,
+                    message="Floor retrieved successfully (cached)"
+                )
+            
             floor = Floor.objects.get(id=floor_id)
             serializer = FloorSerializer(floor)
             
@@ -50,6 +73,9 @@ class FloorQuery:
             ).count()
             data['total_rooms'] = total_rooms
             data['occupied_rooms'] = occupied_rooms
+            
+            # Cache the result
+            GlobalCache.set(cache_key, data)
             
             return BaseResultWithData(
                 data=data,

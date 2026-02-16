@@ -34,6 +34,9 @@ function setupEventListeners() {
     document.getElementById('cancelInvoiceBtn')?.addEventListener('click', closeInvoiceModal);
     document.getElementById('saveInvoiceBtn')?.addEventListener('click', saveInvoice);
     
+    // Details modal controls
+    document.getElementById('closeDetailsModal')?.addEventListener('click', closeDetailsModal);
+    
     // Search
     document.getElementById('invoiceSearchInput')?.addEventListener('keyup', searchInvoices);
 }
@@ -113,96 +116,56 @@ function displayInvoicesAsRows(invoices) {
         return;
     }
     
+    container.style.display = 'grid';
     container.innerHTML = invoices.map(invoice => `
-        <div class="invoice-row" ${invoice.is_deleted ? 'style="opacity: 0.6; border: 2px solid #ff6b6b;"' : ''}>
-            <div class="invoice-info">
-                <div class="invoice-number-section">
-                    <i class="fas fa-file-invoice"></i>
-                    <div class="invoice-details">
-                        <h3 class="invoice-number">
-                            ${invoice.invoice_number || 'N/A'}
-                            ${invoice.is_deleted ? '<span style="color: red; font-size: 0.8rem; margin-left: 0.5rem;">(Deleted)</span>' : ''}
-                        </h3>
-                        <p class="invoice-guest">${invoice.guest_name || 'N/A'}</p>
-                    </div>
+        <div class="invoice-card" style="${invoice.is_deleted ? 'opacity: 0.6; border: 2px solid #ff6b6b;' : ''}">
+            <div class="invoice-card-header">
+                <div class="invoice-number">
+                    <span class="number-label">${invoice.invoice_number || 'N/A'}${invoice.is_deleted ? ' <span style="color: #ff6b6b; font-size: 0.8em;">(Deleted)</span>' : ''}</span>
                 </div>
-                <div class="invoice-booking">
-                    <span class="booking-code">${invoice.booking_confirmation || 'N/A'}</span>
-                </div>
-                <div class="invoice-amounts">
-                    <div class="amount-item">
-                        <span class="amount-label">Subtotal:</span>
-                        <span class="amount-value">₦${parseFloat(invoice.subtotal).toLocaleString()}</span>
-                    </div>
-                    ${invoice.discount_amount > 0 ? `
-                    <div class="amount-item">
-                        <span class="amount-label">Discount:</span>
-                        <span class="amount-value">₦${parseFloat(invoice.discount_amount).toLocaleString()}</span>
-                    </div>
-                    ` : ''}
-                    ${invoice.tax > 0 ? `
-                    <div class="amount-item">
-                        <span class="amount-label">Tax:</span>
-                        <span class="amount-value">₦${parseFloat(invoice.tax).toLocaleString()}</span>
-                    </div>
-                    ` : ''}
-                    <div class="amount-item" style="font-weight: bold;">
-                        <span class="amount-label">Total:</span>
-                        <span class="amount-value">₦${parseFloat(invoice.total).toLocaleString()}</span>
-                    </div>
-                </div>
-                ${invoice.notes ? `
-                <div class="invoice-notes">
-                    <span class="notes-label">Notes:</span>
-                    <span class="notes-value">${invoice.notes}</span>
-                </div>
-                ` : ''}
-            </div>
-            <div class="invoice-dates">
-                <div class="date-item">
-                    <span class="date-label">Check-in:</span>
-                    <span class="date-value">${invoice.check_in ? new Date(invoice.check_in).toLocaleDateString() : 'N/A'}</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-label">Check-out:</span>
-                    <span class="date-value">${invoice.check_out ? new Date(invoice.check_out).toLocaleDateString() : 'N/A'}</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-label">Nights:</span>
-                    <span class="date-value">${invoice.nights || 'N/A'}</span>
-                </div>
-                <div class="date-item">
-                    <span class="date-label">Due:</span>
-                    <span class="date-value">${invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : 'N/A'}</span>
-                </div>
-                ${invoice.payment_date ? `
-                <div class="date-item">
-                    <span class="date-label">Paid:</span>
-                    <span class="date-value">${new Date(invoice.payment_date).toLocaleDateString()}</span>
-                </div>
-                ` : ''}
-                <div class="date-item">
-                    <span class="date-label">Created:</span>
-                    <span class="date-value">${humanizeDate(invoice.created_at)}</span>
-                </div>
-            </div>
-            <div class="invoice-status-section">
-                <span class="status-badge status-${invoice.payment_status?.toLowerCase()}">
+                <div class="status-badge status-${invoice.payment_status?.toLowerCase()}">
                     <i class="fas fa-circle"></i>
                     ${invoice.payment_status?.charAt(0).toUpperCase() + invoice.payment_status?.slice(1).toLowerCase() || 'Pending'}
-                </span>
+                </div>
+                <div class="invoice-actions">
+                    <button class="icon-btn" title="View Details" onclick="openDetailsModal(${invoice.id})" style="color: var(--primary-color);">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="icon-btn print-invoice-btn" title="Print" onclick="printInvoice(${invoice.id})">
+                        <i class="fas fa-print"></i>
+                    </button>
+                    ${invoice.payment_status === 'COMPLETED' && invoice.check_in && invoice.check_out && 
+                      new Date(invoice.check_in) <= new Date(invoice.today) && 
+                      new Date(invoice.today) <= new Date(invoice.check_out) ? `
+                    <button class="icon-btn check-in-btn" title="Check In Guest" onclick="checkInGuest(${invoice.booking})">
+                        <i class="fas fa-door-open"></i>
+                    </button>
+                    ` : ''}
+                </div>
             </div>
-            <div class="invoice-actions">
-                <button class="icon-btn print-invoice-btn" title="Print" onclick="printInvoice(${invoice.id})">
-                    <i class="fas fa-print"></i>
-                </button>
-                ${invoice.payment_status === 'COMPLETED' && invoice.check_in && invoice.check_out && 
-                  new Date(invoice.check_in) <= new Date(invoice.today) && 
-                  new Date(invoice.today) <= new Date(invoice.check_out) ? `
-                <button class="icon-btn check-in-btn" title="Check In Guest" onclick="checkInGuest(${invoice.booking})">
-                    <i class="fas fa-door-open"></i>
-                </button>
-                ` : ''}
+            <div class="invoice-card-body">
+                <div class="invoice-info">
+                    <span class="info-label">Guest:</span>
+                    <span class="info-value">${invoice.guest_name || 'N/A'}</span>
+                </div>
+                <div class="invoice-info">
+                    <span class="info-label">Booking:</span>
+                    <span class="info-value">${invoice.booking_confirmation || 'N/A'}</span>
+                </div>
+                <div class="invoice-dates">
+                    <div class="date-item">
+                        <span class="date-label">Check-in:</span>
+                        <span class="date-value">${invoice.check_in ? new Date(invoice.check_in).toLocaleDateString() : 'N/A'}</span>
+                    </div>
+                    <div class="date-item">
+                        <span class="date-label">Check-out:</span>
+                        <span class="date-value">${invoice.check_out ? new Date(invoice.check_out).toLocaleDateString() : 'N/A'}</span>
+                    </div>
+                </div>
+                <div class="invoice-amount">
+                    <span class="amount-label">Total:</span>
+                    <span class="amount-value">₦${parseFloat(invoice.total).toLocaleString()}</span>
+                </div>
             </div>
         </div>
     `).join('');
@@ -258,6 +221,57 @@ async function saveInvoice() {
         console.error('Error saving invoice:', error);
         showModal('Error saving invoice. Please try again.', 'fail');
     }
+}
+
+function openDetailsModal(invoiceId) {
+    const invoice = allInvoices.find(inv => inv.id === invoiceId);
+    if (!invoice) return;
+    
+    // Populate basic info
+    document.getElementById('detailsInvoiceNumber').textContent = invoice.invoice_number || 'N/A';
+    document.getElementById('detailsGuestName').textContent = invoice.guest_name || 'N/A';
+    document.getElementById('detailsBookingConfirmation').textContent = invoice.booking_confirmation || 'N/A';
+    
+    // Populate dates
+    document.getElementById('detailsCheckIn').textContent = invoice.check_in ? new Date(invoice.check_in).toLocaleDateString() : 'N/A';
+    document.getElementById('detailsCheckOut').textContent = invoice.check_out ? new Date(invoice.check_out).toLocaleDateString() : 'N/A';
+    document.getElementById('detailsNights').textContent = invoice.nights || 'N/A';
+    document.getElementById('detailsDueDate').textContent = invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : 'N/A';
+    
+    // Populate amounts
+    document.getElementById('detailsSubtotal').textContent = `₦${parseFloat(invoice.subtotal).toLocaleString()}`;
+    document.getElementById('detailsDiscount').textContent = `₦${parseFloat(invoice.discount_amount || 0).toLocaleString()}`;
+    document.getElementById('detailsTax').textContent = `₦${parseFloat(invoice.tax || 0).toLocaleString()}`;
+    document.getElementById('detailsTotal').textContent = `₦${parseFloat(invoice.total).toLocaleString()}`;
+    
+    // Populate status and payment info
+    document.getElementById('detailsPaymentStatus').textContent = invoice.payment_status?.charAt(0).toUpperCase() + invoice.payment_status?.slice(1).toLowerCase() || 'N/A';
+    
+    // Populate payment date if available
+    const paymentDateElement = document.getElementById('detailsPaymentDate');
+    const paymentSection = document.getElementById('paymentDateSection');
+    if (invoice.payment_date) {
+        paymentDateElement.textContent = new Date(invoice.payment_date).toLocaleDateString();
+        paymentSection.style.display = 'block';
+    } else {
+        paymentSection.style.display = 'none';
+    }
+    
+    // Populate notes if available
+    const notesElement = document.getElementById('detailsNotes');
+    const notesSection = document.getElementById('notesSection');
+    if (invoice.notes) {
+        notesElement.textContent = invoice.notes;
+        notesSection.style.display = 'block';
+    } else {
+        notesSection.style.display = 'none';
+    }
+    
+    document.getElementById('detailsInvoiceModal').classList.add('active');
+}
+
+function closeDetailsModal() {
+    document.getElementById('detailsInvoiceModal').classList.remove('active');
 }
 
 function printInvoice(invoiceId) {

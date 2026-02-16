@@ -53,6 +53,9 @@ function setupEventListeners() {
     document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
     document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
     
+    // Details modal controls
+    document.getElementById('closeDetailsModal')?.addEventListener('click', closeDetailsModal);
+    
     // Search
     document.getElementById('roomSearchInput')?.addEventListener('keyup', searchRooms);
 }
@@ -170,7 +173,10 @@ function displayRoomsAsCards(rooms) {
                     <i class="fas fa-circle"></i>
                     ${room.status?.charAt(0).toUpperCase() + room.status?.slice(1).toLowerCase() || 'Available'}
                 </div>
-                <div class="room-actions">
+                <div class="room-actions" style="display: flex; gap: 0.5rem; margin-left: auto;">
+                    <button class="icon-btn" title="View Details" onclick="openDetailsModal(${room.id})" style="color: var(--primary-color);">
+                        <i class="fas fa-eye"></i>
+                    </button>
                     <button class="icon-btn edit-room-btn" title="Edit" data-id="${room.id}" onclick="openEditModal(${room.id})" ${room.is_deleted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                         <i class="fas fa-edit"></i>
                     </button>
@@ -195,31 +201,12 @@ function displayRoomsAsCards(rooms) {
                     <span class="info-value">${room.max_occupancy || 0} Guests</span>
                 </div>
                 <div class="room-price">
-                    ${room.price_override ? `
-                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                            <div style="display: flex; align-items: baseline; gap: 0.25rem;">
-                                <span class="price-label">₦</span>
-                                <span class="price-value">${room.price_override.toLocaleString()}</span>
-                                <span class="price-override-badge">Override</span>
-                            </div>
-                            <div style="display: flex; align-items: baseline; gap: 0.25rem; opacity: 0.6; text-decoration: line-through;">
-                                <span class="price-label">₦</span>
-                                <span style="font-size: 0.85rem;">${(room.base_price || 0).toLocaleString()}</span>
-                            </div>
-                        </div>
-                    ` : `
-                        <div style="display: flex; align-items: baseline; gap: 0.25rem;">
-                            <span class="price-label">₦</span>
-                            <span class="price-value">${(room.base_price || 0).toLocaleString()}</span>
-                        </div>
-                    `}
+                    <div style="display: flex; align-items: baseline; gap: 0.25rem;">
+                        <span class="price-label">₦</span>
+                        <span class="price-value">${room.price_override ? room.price_override.toLocaleString() : (room.base_price || 0).toLocaleString()}</span>
+                        ${room.price_override ? '<span class="price-override-badge" style="font-size: 0.7rem;">Override</span>' : ''}
+                    </div>
                 </div>
-                ${room.notes ? `
-                <div class="room-notes">
-                    <span class="notes-label">Notes:</span>
-                    <span class="notes-value">${room.notes}</span>
-                </div>
-                ` : ''}
             </div>
         </div>
     `).join('');
@@ -327,6 +314,80 @@ function openDeleteModal(roomId) {
 function closeDeleteModal() {
     document.getElementById('deleteRoomModal').classList.remove('active');
     currentRoomId = null;
+}
+
+function openDetailsModal(roomId) {
+    const room = allRooms.find(r => r.id === roomId);
+    if (!room) return;
+    
+    const modal = document.getElementById('detailsRoomModal');
+    if (!modal) return;
+    
+    // Populate details
+    document.getElementById('detailsRoomNumber').textContent = `Room ${room.number}`;
+    document.getElementById('detailsRoomFloor').textContent = `Floor ${room.floor_number || 'N/A'}`;
+    document.getElementById('detailsRoomType').textContent = room.room_type_name || 'N/A';
+    document.getElementById('detailsRoomStatus').textContent = room.status?.charAt(0).toUpperCase() + room.status?.slice(1).toLowerCase() || 'Available';
+    document.getElementById('detailsRoomCapacity').textContent = `${room.max_occupancy || 0} Guests`;
+    
+    // Price section
+    const priceSection = document.getElementById('detailsRoomPrice');
+    if (room.price_override) {
+        priceSection.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                    <span style="font-weight: 600;">Current Price:</span>
+                    <span style="font-size: 1.3rem; color: var(--primary-color);">₦${room.price_override.toLocaleString()}</span>
+                    <span style="background-color: var(--primary-color); color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">OVERRIDE</span>
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 0.5rem; opacity: 0.7;">
+                    <span style="font-weight: 600;">Base Price:</span>
+                    <span style="text-decoration: line-through;">₦${(room.base_price || 0).toLocaleString()}</span>
+                </div>
+            </div>
+        `;
+    } else {
+        priceSection.innerHTML = `
+            <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                <span style="font-weight: 600;">Price:</span>
+                <span style="font-size: 1.3rem; color: var(--primary-color);">₦${(room.base_price || 0).toLocaleString()}</span>
+            </div>
+        `;
+    }
+    
+    // Notes section
+    const notesSection = document.getElementById('detailsRoomNotes');
+    if (room.notes) {
+        notesSection.innerHTML = `
+            <div style="background-color: var(--input-bg); padding: 1rem; border-radius: 0.5rem; margin-top: 0.5rem; border-left: 4px solid var(--primary-color);">
+                ${room.notes}
+            </div>
+        `;
+    } else {
+        notesSection.innerHTML = `
+            <div style="color: var(--text-muted); font-style: italic; margin-top: 0.5rem;">
+                No notes added
+            </div>
+        `;
+    }
+    
+    // Status badge styling
+    const statusBadge = document.getElementById('detailsRoomStatus');
+    statusBadge.style.display = 'inline-block';
+    statusBadge.style.padding = '0.5rem 1rem';
+    statusBadge.style.borderRadius = '0.25rem';
+    statusBadge.style.fontWeight = '600';
+    statusBadge.style.marginTop = '0.5rem';
+    statusBadge.className = `status-badge status-${room.status?.toLowerCase()}`;
+    
+    modal.classList.add('active');
+}
+
+function closeDetailsModal() {
+    const modal = document.getElementById('detailsRoomModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
 }
 
 async function saveRoom() {

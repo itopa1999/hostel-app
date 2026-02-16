@@ -47,6 +47,9 @@ function setupEventListeners() {
     document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
     document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
     
+    // Details modal controls
+    document.getElementById('closeDetailsModal')?.addEventListener('click', closeDetailsModal);
+    
     // Search
     document.getElementById('bookingSearchInput')?.addEventListener('keyup', searchBookings);
     
@@ -175,13 +178,16 @@ function displayBookingsAsCards(bookings) {
         <div class="booking-card" style="${booking.is_deleted ? 'opacity: 0.6; border: 2px solid #ff6b6b;' : ''}">
             <div class="booking-card-header">
                 <div class="booking-code">
-                    <span class="code-label">${booking.confirmation_code || 'N/A'} <span style="font-size: 0.85em; color: #999;">(ID: ${booking.id})</span>${booking.is_deleted ? ' <span style="color: #ff6b6b; font-size: 0.8em;">(Deleted)</span>' : ''}</span>
+                    <span class="code-label">${booking.confirmation_code || 'N/A'}${booking.is_deleted ? ' <span style="color: #ff6b6b; font-size: 0.8em;">(Deleted)</span>' : ''}</span>
                 </div>
                 <div class="status-badge status-${booking.status?.toLowerCase()}">
                     <i class="fas fa-circle"></i>
                     ${booking.status?.charAt(0).toUpperCase() + booking.status?.slice(1).toLowerCase() || 'Pending'}
                 </div>
                 <div class="booking-actions">
+                    <button class="icon-btn" title="View Details" onclick="openDetailsModal(${booking.id})" style="color: var(--primary-color);">
+                        <i class="fas fa-eye"></i>
+                    </button>
                     <button class="icon-btn edit-booking-btn" title="Edit" data-id="${booking.id}" onclick="openEditModal(${booking.id})" ${booking.is_deleted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                         <i class="fas fa-edit"></i>
                     </button>
@@ -201,10 +207,6 @@ function displayBookingsAsCards(bookings) {
                     <span class="info-label">Room:</span>
                     <span class="info-value">Room ${booking.room_number || 'N/A'}</span>
                 </div>
-                <div class="booking-info">
-                    <span class="info-label">Room Type:</span>
-                    <span class="info-value">${booking.room_type_name || 'N/A'}</span>
-                </div>
                 <div class="booking-dates">
                     <div class="date-item">
                         <span class="date-label">Check-in:</span>
@@ -215,45 +217,56 @@ function displayBookingsAsCards(bookings) {
                         <span class="date-value">${booking.check_out ? new Date(booking.check_out).toLocaleDateString() : 'N/A'}</span>
                     </div>
                 </div>
-                <div class="booking-info">
-                    <span class="info-label">Number of Guests:</span>
-                    <span class="info-value">${booking.number_of_guests || 0}</span>
-                </div>
-                <div class="booking-info">
-                    <span class="info-label">Status:</span>
-                    <span class="info-value">${booking.status?.charAt(0).toUpperCase() + booking.status?.slice(1).toLowerCase() || 'N/A'}</span>
-                </div>
-                <div class="booking-info">
-                    <span class="info-label">Payment Status:</span>
-                    <span class="info-value payment-badge status-${booking.payment_status?.toLowerCase()}">${booking.payment_status?.charAt(0).toUpperCase() + booking.payment_status?.slice(1).toLowerCase() || 'N/A'}</span>
-                </div>
-                ${booking.special_requests ? `
-                <div class="booking-info">
-                    <span class="info-label">Special Requests:</span>
-                    <span class="info-value">${booking.special_requests}</span>
-                </div>
-                ` : ''}
-                ${booking.cancellation_reason ? `
-                <div class="booking-info">
-                    <span class="info-label">Cancellation Reason:</span>
-                    <span class="info-value">${booking.cancellation_reason}</span>
-                </div>
-                ` : ''}
-                ${booking.cancellation_date ? `
-                <div class="booking-info">
-                    <span class="info-label">Cancelled:</span>
-                    <span class="info-value">${humanizeDate(booking.cancellation_date)}</span>
-                </div>
-                ` : ''}
-                ${booking.created_at ? `
-                <div class="booking-info">
-                    <span class="info-label">Created:</span>
-                    <span class="info-value">${humanizeDate(booking.created_at)}</span>
-                </div>
-                ` : ''}
             </div>
         </div>
     `).join('');
+}
+
+function openDetailsModal(bookingId) {
+    const booking = allBookings.find(b => b.id === bookingId);
+    if (!booking) return;
+    
+    // Populate basic info
+    document.getElementById('detailsBookingCode').textContent = booking.confirmation_code || 'N/A';
+    document.getElementById('detailsConfirmationCode').textContent = booking.confirmation_code || 'N/A';
+    document.getElementById('detailsGuestName').textContent = booking.guest_name || 'N/A';
+    document.getElementById('detailsRoomNumber').textContent = booking.room_number || 'N/A';
+    document.getElementById('detailsRoomType').textContent = booking.room_type_name || 'N/A';
+    
+    // Populate dates
+    document.getElementById('detailsCheckIn').textContent = booking.check_in ? new Date(booking.check_in).toLocaleDateString() : 'N/A';
+    document.getElementById('detailsCheckOut').textContent = booking.check_out ? new Date(booking.check_out).toLocaleDateString() : 'N/A';
+    
+    // Populate status and details
+    document.getElementById('detailsStatus').textContent = booking.status?.charAt(0).toUpperCase() + booking.status?.slice(1).toLowerCase() || 'N/A';
+    document.getElementById('detailsPaymentStatus').textContent = booking.payment_status?.charAt(0).toUpperCase() + booking.payment_status?.slice(1).toLowerCase() || 'N/A';
+    document.getElementById('detailsNumberOfGuests').textContent = booking.number_of_guests || 0;
+    
+    // Populate special requests and notes
+    const specialRequestsElement = document.getElementById('detailsSpecialRequests');
+    const specialRequestsSection = document.getElementById('specialRequestsSection');
+    if (booking.special_requests) {
+        specialRequestsElement.textContent = booking.special_requests;
+        specialRequestsSection.style.display = 'block';
+    } else {
+        specialRequestsSection.style.display = 'none';
+    }
+    
+    // Populate cancellation info if applicable
+    const cancellationElement = document.getElementById('detailsCancellationReason');
+    const cancellationSection = document.getElementById('cancellationSection');
+    if (booking.cancellation_reason) {
+        cancellationElement.textContent = booking.cancellation_reason;
+        cancellationSection.style.display = 'block';
+    } else {
+        cancellationSection.style.display = 'none';
+    }
+    
+    document.getElementById('detailsBookingModal').classList.add('active');
+}
+
+function closeDetailsModal() {
+    document.getElementById('detailsBookingModal').classList.remove('active');
 }
 
 function openCreateModal() {

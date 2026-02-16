@@ -144,6 +144,10 @@ class CacheKeys(Enum):
     # User Cache
     USER_PROFILE = "user:profile:{user_id}"
     USER_ALL = "user:all"
+    USER_ID = "user:id:{user_id}"
+    
+    # Group Cache
+    GROUP_ALL = "group:all"
 
     @classmethod
     def format(cls, key, **kwargs):

@@ -475,6 +475,9 @@ const APIInterceptor = {
     
     fetch: async function(url, options = {}) {
         try {
+            // Ensure credentials are always included (for cookies)
+            options.credentials = options.credentials || 'include';
+            
             const response = await fetch(url, options);
             
             // Check for authentication-related errors (401 Unauthorized, 403 Forbidden)
@@ -499,6 +502,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup logout button functionality
     setupLogoutButton();
+    
+    // Setup notification button functionality
+    setupNotificationButton();
 });
 
 // Logout Function - Clear session and redirect to login
@@ -517,6 +523,17 @@ function setupLogoutButton() {
         logoutBtn.addEventListener('click', function(e) {
             e.preventDefault();
             performLogout();
+        });
+    }
+}
+
+// Setup notification button click handler
+function setupNotificationButton() {
+    const notificationBtn = document.querySelector('.notification-btn');
+    if (notificationBtn) {
+        notificationBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            showModal('Notifications feature coming soon!', 'info');
         });
     }
 }

@@ -1,9 +1,13 @@
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
+from django.contrib.auth.models import Group
+from apps.users.models import User
 from utils.base_model import BaseModel
 from utils.Middlewares.threadlocals import get_current_user
 from utils.enums import GroupNames
+from utils.cache_helper import GlobalCache
+from utils.enums import CacheKeys
 
 
 # Dynamic Group to ID prefix mapping based on enum
@@ -72,4 +76,42 @@ def auto_assign_user_id_number(sender, instance, created, **kwargs):
     
     # Save without triggering signals again
     instance.save(update_fields=['id_number'])
+
+
+# User Cache Invalidation
+@receiver(post_save, sender=User)
+def invalidate_user_cache_on_save(sender, instance, created, **kwargs):
+    """Invalidate user cache when a user is created or updated"""
+    GlobalCache.delete(CacheKeys.USER_ALL.value)
+    GlobalCache.delete(CacheKeys.format(CacheKeys.USER_ID, user_id=instance.id))
+    GlobalCache.delete_prefix("user:")
+
+
+@receiver(post_delete, sender=User)
+def invalidate_user_cache_on_delete(sender, instance, **kwargs):
+    """Invalidate user cache when a user is deleted (soft delete)"""
+    GlobalCache.delete(CacheKeys.USER_ALL.value)
+    GlobalCache.delete(CacheKeys.format(CacheKeys.USER_ID, user_id=instance.id))
+    GlobalCache.delete_prefix("user:")
+
+
+# Group Cache Invalidation
+@receiver(post_save, sender=Group)
+def invalidate_group_cache_on_save(sender, instance, created, **kwargs):
+    """Invalidate group cache when a group is created or updated"""
+    GlobalCache.delete(CacheKeys.GROUP_ALL.value)
+    GlobalCache.delete_prefix("group:")
+    # Also invalidate user cache since groups affect user data
+    GlobalCache.delete(CacheKeys.USER_ALL.value)
+    GlobalCache.delete_prefix("user:")
+
+
+@receiver(post_delete, sender=Group)
+def invalidate_group_cache_on_delete(sender, instance, **kwargs):
+    """Invalidate group cache when a group is deleted"""
+    GlobalCache.delete(CacheKeys.GROUP_ALL.value)
+    GlobalCache.delete_prefix("group:")
+    # Also invalidate user cache
+    GlobalCache.delete(CacheKeys.USER_ALL.value)
+    GlobalCache.delete_prefix("user:")
       

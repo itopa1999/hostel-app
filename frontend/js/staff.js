@@ -50,6 +50,9 @@ function setupEventListeners() {
         saveStaffBtn.addEventListener('click', createNewStaff);
     }
 
+    // Details modal
+    document.getElementById('closeDetailsModal')?.addEventListener('click', closeDetailsModal);
+
     // Change Group modal buttons
     const closeChangeGroupModal = document.getElementById('closeChangeGroupModal');
     if (closeChangeGroupModal) {
@@ -157,68 +160,44 @@ function displayStaffAsCards(staff) {
     
     container.style.display = 'grid';
     container.innerHTML = staff.map(user => `
-        <div class="guest-card" style="${user.is_deleted ? 'opacity: 0.6; border: 2px solid #ff6b6b;' : ''}">
-            <div class="guest-card-header">
-                <div class="guest-header-left">
-                    <div class="guest-avatar-circle" style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem;">
-                        ${(user.first_name?.charAt(0) || user.username?.charAt(0) || 'U').toUpperCase()}
-                    </div>
-                    <div>
-                        <div class="guest-name">${user.full_name || user.username} ${user.is_deleted ? '<span style="color: #ff6b6b; font-size: 0.8em; margin-left: 0.5rem;">(Deleted)</span>' : ''}</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted);">${user.username}</div>
-                    </div>
+        <div class="staff-card" style="${user.is_deleted ? 'opacity: 0.6; border: 2px solid #ff6b6b;' : ''}">
+            <div class="staff-card-header">
+                <div class="staff-number">
+                    <span class="number-label">${user.full_name || user.username}${user.is_deleted ? ' <span style="color: #ff6b6b; font-size: 0.8em;">(Deleted)</span>' : ''}</span>
                 </div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <div class="guest-status-badge">
-                        <i class="fas fa-user-tie"></i> Staff
-                    </div>
-                    <div style="display: flex; gap: 0.25rem;">
-                        <button class="icon-btn edit-staff-btn" title="Change Group" data-id="${user.id}" onclick="openChangeGroupModal(${user.id}, '${user.username}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="icon-btn ${user.is_deleted ? 'reactivate-staff-btn' : 'delete-staff-btn'}" title="${user.is_deleted ? 'Reactivate' : 'Delete'}" data-id="${user.id}" onclick="toggleDeleteStaff(${user.id})">
-                            <i class="fas fa-${user.is_deleted ? 'undo' : 'trash'}"></i>
-                        </button>
-                    </div>
+                <div class="staff-status-badge">
+                    <i class="fas fa-user-tie"></i>
+                    Staff
+                </div>
+                <div class="staff-actions">
+                    <button class="icon-btn" title="View Details" onclick="openDetailsModal(${user.id})" style="color: var(--primary-color);">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="icon-btn edit-staff-btn" title="Change Group" data-id="${user.id}" onclick="openChangeGroupModal(${user.id}, '${user.username}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="icon-btn ${user.is_deleted ? 'reactivate-staff-btn' : 'delete-staff-btn'}" title="${user.is_deleted ? 'Reactivate' : 'Delete'}" data-id="${user.id}" onclick="toggleDeleteStaff(${user.id})">
+                        <i class="fas fa-${user.is_deleted ? 'undo' : 'trash'}"></i>
+                    </button>
                 </div>
             </div>
-            <div class="guest-card-body">
-                ${user.email ? `
-                <div class="guest-info">
+            <div class="staff-card-body">
+                <div class="staff-info">
+                    <span class="info-label">Username:</span>
+                    <span class="info-value">${user.username}</span>
+                </div>
+                <div class="staff-info">
                     <span class="info-label">Email:</span>
-                    <span class="info-value"><a href="mailto:${user.email}" style="color: #667eea; text-decoration: none;">${user.email}</a></span>
+                    <span class="info-value">${user.email || 'N/A'}</span>
                 </div>
-                ` : ''}
-                <div class="guest-info">
-                    <span class="info-label">ID Number:</span>
-                    <span class="info-value">${user.id_number || 'N/A'}</span>
-                </div>
-                <div class="guest-info">
+                <div class="staff-info">
                     <span class="info-label">Groups:</span>
-                    <span class="info-value">${user.groups?.length > 0 ? user.groups.map(g => `<span style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; margin-right: 0.25rem;">${g}</span>`).join('') : '<span style="color: var(--text-muted);">No groups assigned</span>'}</span>
+                    <span class="info-value">${user.groups?.length > 0 ? user.groups.join(', ') : 'N/A'}</span>
                 </div>
-                <div class="guest-stats">
-                    <div class="stat">
-                        <span class="stat-value">${humanizeDate(user.date_joined)}</span>
-                        <span class="stat-label">Joined</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-value">${user.last_login ? humanizeDate(user.last_login) : 'Never'}</span>
-                        <span class="stat-label">Last Login</span>
-                    </div>
+                <div class="staff-info">
+                    <span class="info-label">Joined:</span>
+                    <span class="info-value">${user.date_joined ? new Date(user.date_joined).toLocaleDateString() : 'N/A'}</span>
                 </div>
-                ${user.created_by ? `
-                <div class="guest-info">
-                    <span class="info-label">Created By:</span>
-                    <span class="info-value">${user.created_by}</span>
-                </div>
-                ` : ''}
-                ${user.is_deleted && user.deleted_at ? `
-                <div class="guest-info" style="background: #ffe0e0; padding: 0.5rem; border-radius: 0.25rem;">
-                    <span class="info-label">Deleted:</span>
-                    <span class="info-value">${humanizeDate(user.deleted_at)}${user.deleted_by ? ` by ${user.deleted_by}` : ''}</span>
-                </div>
-                ` : ''}
             </div>
         </div>
     `).join('');
@@ -505,5 +484,39 @@ async function createNewStaff() {
         console.error('Error creating staff:', error);
         showModal('Error creating staff. Please try again.', 'fail');
     }
+}
+
+function openDetailsModal(userId) {
+    const user = allStaff.find(u => u.id === userId);
+    if (!user) return;
+    
+    document.getElementById('detailsFullName').textContent = user.full_name || 'N/A';
+    document.getElementById('detailsUsername').textContent = user.username || 'N/A';
+    document.getElementById('detailsEmail').textContent = user.email || 'N/A';
+    document.getElementById('detailsIdNumber').textContent = user.id_number || 'N/A';
+    document.getElementById('detailsGroups').textContent = user.groups?.length > 0 ? user.groups.join(', ') : 'No groups assigned';
+    document.getElementById('detailsDateJoined').textContent = user.date_joined ? new Date(user.date_joined).toLocaleDateString() : 'N/A';
+    document.getElementById('detailsLastLogin').textContent = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never';
+    
+    if (user.created_by) {
+        document.getElementById('detailsCreatedBySection').style.display = 'block';
+        document.getElementById('detailsCreatedBy').textContent = user.created_by;
+    } else {
+        document.getElementById('detailsCreatedBySection').style.display = 'none';
+    }
+    
+    if (user.is_deleted && user.deleted_at) {
+        document.getElementById('detailsDeletedSection').style.display = 'block';
+        document.getElementById('detailsDeletedAt').textContent = new Date(user.deleted_at).toLocaleDateString();
+        document.getElementById('detailsDeletedBy').textContent = user.deleted_by || 'N/A';
+    } else {
+        document.getElementById('detailsDeletedSection').style.display = 'none';
+    }
+    
+    document.getElementById('detailsStaffModal').classList.add('active');
+}
+
+function closeDetailsModal() {
+    document.getElementById('detailsStaffModal').classList.remove('active');
 }
 

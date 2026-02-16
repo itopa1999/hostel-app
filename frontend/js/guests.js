@@ -40,6 +40,9 @@ function setupEventListeners() {
     document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
     document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
     
+    // Details modal controls
+    document.getElementById('closeDetailsModal')?.addEventListener('click', closeDetailsModal);
+    
     // Search
     document.getElementById('guestSearchInput')?.addEventListener('keyup', searchGuests);
 }
@@ -92,18 +95,19 @@ function displayGuestsAsCards(guests) {
         <div class="guest-card" style="${guest.is_deleted ? 'opacity: 0.6; border: 2px solid #ff6b6b;' : ''}">
             <div class="guest-card-header">
                 <div class="guest-name">${guest.name || 'N/A'} ${guest.is_deleted ? '<span style="color: #ff6b6b; font-size: 0.8em; margin-left: 0.5rem;">(Deleted)</span>' : ''}</div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <div class="guest-status-badge">
-                        <i class="fas fa-user-circle"></i> Guest
-                    </div>
-                    <div style="display: flex; gap: 0.25rem;">
-                        <button class="icon-btn edit-guest-btn" title="Edit" data-id="${guest.id}" onclick="openEditModal(${guest.id})" ${guest.is_deleted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="icon-btn ${guest.is_deleted ? 'reactivate-guest-btn' : 'delete-guest-btn'}" title="${guest.is_deleted ? 'Reactivate' : 'Delete'}" data-id="${guest.id}" onclick="openDeleteModal(${guest.id})">
-                            <i class="fas fa-${guest.is_deleted ? 'undo' : 'trash'}"></i>
-                        </button>
-                    </div>
+                <div class="guest-status-badge">
+                    <i class="fas fa-user-circle"></i> Guest
+                </div>
+                <div class="guest-actions" style="display: flex; gap: 0.5rem; margin-left: auto;">
+                    <button class="icon-btn" title="View Details" onclick="openDetailsModal(${guest.id})" style="color: var(--primary-color);">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="icon-btn edit-guest-btn" title="Edit" data-id="${guest.id}" onclick="openEditModal(${guest.id})" ${guest.is_deleted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="icon-btn ${guest.is_deleted ? 'reactivate-guest-btn' : 'delete-guest-btn'}" title="${guest.is_deleted ? 'Reactivate' : 'Delete'}" data-id="${guest.id}" onclick="openDeleteModal(${guest.id})">
+                        <i class="fas fa-${guest.is_deleted ? 'undo' : 'trash'}"></i>
+                    </button>
                 </div>
             </div>
             <div class="guest-card-body">
@@ -116,47 +120,19 @@ function displayGuestsAsCards(guests) {
                     <span class="info-value">${guest.phone || 'N/A'}</span>
                 </div>
                 <div class="guest-info">
-                    <span class="info-label">Address:</span>
-                    <span class="info-value">${guest.address || 'N/A'}</span>
-                </div>
-                <div class="guest-info">
                     <span class="info-label">City:</span>
                     <span class="info-value">${guest.city || 'N/A'}</span>
                 </div>
-                <div class="guest-info">
-                    <span class="info-label">Country:</span>
-                    <span class="info-value">${guest.country || 'N/A'}</span>
-                </div>
-                <div class="guest-info">
-                    <span class="info-label">Postal Code:</span>
-                    <span class="info-value">${guest.postal_code || 'N/A'}</span>
-                </div>
-                <div class="guest-info">
-                    <span class="info-label">Nationality:</span>
-                    <span class="info-value">${guest.nationality || 'N/A'}</span>
-                </div>
                 ${guest.total_stays !== undefined ? `
-                <div class="guest-stats">
-                    <div class="stat">
-                        <span class="stat-value">${guest.total_stays}</span>
-                        <span class="stat-label">Total Stays</span>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary-color);">${guest.total_stays}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Total Stays</div>
                     </div>
-                    <div class="stat">
-                        <span class="stat-value">${guest.first_visit_date ? humanizeDate(guest.first_visit_date) : 'Not booked yet'}</span>
-                        <span class="stat-label">First Visit</span>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1rem; font-weight: 500;">${guest.first_visit_date ? humanizeDate(guest.first_visit_date) : 'Not booked'}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">First Visit</div>
                     </div>
-                </div>
-                ` : ''}
-                ${guest.created_at ? `
-                <div class="guest-info">
-                    <span class="info-label">Registered:</span>
-                    <span class="info-value">${humanizeDate(guest.created_at)}</span>
-                </div>
-                ` : ''}
-                ${guest.notes ? `
-                <div class="guest-notes">
-                    <span class="notes-label">Notes:</span>
-                    <span class="notes-value">${guest.notes}</span>
                 </div>
                 ` : ''}
             </div>
@@ -193,6 +169,56 @@ function openDeleteModal(guestId) {
 function closeDeleteModal() {
     document.getElementById('deleteGuestModal').classList.remove('active');
     currentGuestId = null;
+}
+
+function openDetailsModal(guestId) {
+    const guest = allGuests.find(g => g.id === guestId);
+    if (!guest) return;
+    
+    const modal = document.getElementById('detailsGuestModal');
+    if (!modal) return;
+    
+    // Populate basic info
+    document.getElementById('detailsGuestName').textContent = guest.name || 'N/A';
+    document.getElementById('detailsGuestEmail').textContent = guest.email || 'N/A';
+    document.getElementById('detailsGuestPhone').textContent = guest.phone || 'N/A';
+    document.getElementById('detailsGuestNationality').textContent = guest.nationality || 'N/A';
+    
+    // Populate address info
+    document.getElementById('detailsGuestAddress').textContent = guest.address || 'Not provided';
+    document.getElementById('detailsGuestCity').textContent = guest.city || 'Not provided';
+    document.getElementById('detailsGuestCountry').textContent = guest.country || 'Not provided';
+    document.getElementById('detailsGuestPostalCode').textContent = guest.postal_code || 'Not provided';
+    
+    // Populate stats
+    document.getElementById('detailsGuestTotalStays').textContent = guest.total_stays || 0;
+    document.getElementById('detailsGuestFirstVisit').textContent = guest.first_visit_date ? humanizeDate(guest.first_visit_date) : 'Not booked yet';
+    document.getElementById('detailsGuestRegistered').textContent = guest.created_at ? humanizeDate(guest.created_at) : 'N/A';
+    
+    // Populate notes
+    const notesSection = document.getElementById('detailsGuestNotes');
+    if (guest.notes) {
+        notesSection.innerHTML = `
+            <div style="background-color: var(--input-bg); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid var(--primary-color);">
+                ${guest.notes}
+            </div>
+        `;
+    } else {
+        notesSection.innerHTML = `
+            <div style="color: var(--text-muted); font-style: italic;">
+                No notes added
+            </div>
+        `;
+    }
+    
+    modal.classList.add('active');
+}
+
+function closeDetailsModal() {
+    const modal = document.getElementById('detailsGuestModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
 }
 
 function openEditModal(guestId) {

@@ -39,6 +39,9 @@ function setupEventListeners() {
     document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
     document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
     
+    // Details modal
+    document.getElementById('closeDetailsModal')?.addEventListener('click', closeDetailsModal);
+    
     // Search
     document.getElementById('paymentSearchInput')?.addEventListener('keyup', searchPayments);
 }
@@ -120,74 +123,48 @@ function displayPaymentsAsCards(payments) {
         return;
     }
     
+    container.style.display = 'grid';
     container.innerHTML = payments.map(payment => `
         <div class="payment-card" style="${payment.is_deleted ? 'opacity: 0.6; border: 2px solid #ff6b6b;' : ''}">
-            <div class="payment-header">
+            <div class="payment-card-header">
+                <div class="payment-number">
+                    <span class="number-label">Invoice #${payment.invoice_number || 'N/A'}${payment.is_deleted ? ' <span style="color: #ff6b6b; font-size: 0.8em;">(Deleted)</span>' : ''}</span>
+                </div>
+                <div class="status-badge status-${payment.payment_status?.toLowerCase()}">
+                    <i class="fas fa-circle"></i>
+                    ${payment.payment_status?.charAt(0).toUpperCase() + payment.payment_status?.slice(1).toLowerCase() || 'Pending'}
+                </div>
+                <div class="payment-actions">
+                    <button class="icon-btn" title="View Details" onclick="openDetailsModal(${payment.id})" style="color: var(--primary-color);">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="icon-btn edit-payment-btn" title="Edit" onclick="openEditModal(${payment.id})" ${payment.is_deleted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    ${isAdmin ? `
+                    <button class="icon-btn ${payment.is_deleted ? 'reactivate-payment-btn' : 'delete-payment-btn'}" title="${payment.is_deleted ? 'Reactivate' : 'Delete'}" onclick="openDeleteModal(${payment.id})">
+                        <i class="fas fa-${payment.is_deleted ? 'undo' : 'trash'}"></i>
+                    </button>
+                    ` : ''}
+                </div>
+            </div>
+            <div class="payment-card-body">
                 <div class="payment-info">
-                    <div class="payment-invoice-number">Invoice #${payment.invoice_number || 'N/A'}</div>
-                    <div class="payment-booking-code">${payment.booking_confirmation || 'N/A'}</div>
+                    <span class="info-label">Booking:</span>
+                    <span class="info-value">${payment.booking_confirmation || 'N/A'}</span>
                 </div>
-                <div style="display: flex; gap: 0.75rem; align-items: center;">
-                    ${payment.is_deleted ? '<span style="color: #ff6b6b; font-size: 0.8em; font-weight: 600;">(Deleted)</span>' : ''}
-                    <span class="payment-status-badge status-${payment.payment_status?.toLowerCase()}">
-                        ${payment.payment_status?.charAt(0).toUpperCase() + payment.payment_status?.slice(1).toLowerCase() || 'Pending'}
-                    </span>
+                <div class="payment-info">
+                    <span class="info-label">Method:</span>
+                    <span class="info-value">${payment.method || 'N/A'}</span>
                 </div>
-            </div>
-            
-            <div class="payment-amount">₦${parseFloat(payment.amount).toLocaleString()}</div>
-            
-            <div class="payment-details">
-                <div class="detail-row">
-                    <span class="label">Method:</span>
-                    <span class="value">${payment.method || 'N/A'}</span>
+                <div class="payment-info">
+                    <span class="info-label">Amount:</span>
+                    <span class="info-value">₦${parseFloat(payment.amount).toLocaleString()}</span>
                 </div>
-                <div class="detail-row">
-                    <span class="label">Transaction ID:</span>
-                    <span class="value">${payment.transaction_id || 'N/A'}</span>
+                <div class="payment-info">
+                    <span class="info-label">Date:</span>
+                    <span class="info-value">${payment.created_at ? new Date(payment.created_at).toLocaleDateString() : 'N/A'}</span>
                 </div>
-                <div class="detail-row">
-                    <span class="label">Receipt Number:</span>
-                    <span class="value">${payment.receipt_number || 'N/A'}</span>
-                </div>
-                ${payment.reference ? `
-                <div class="detail-row">
-                    <span class="label">Reference:</span>
-                    <span class="value">${payment.reference}</span>
-                </div>
-                ` : ''}
-                ${payment.refund_amount > 0 ? `
-                <div class="detail-row">
-                    <span class="label">Refund Amount:</span>
-                    <span class="value" style="color: #ff6b6b;">₦${parseFloat(payment.refund_amount).toLocaleString()}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Refund Date:</span>
-                    <span class="value">${payment.refund_date ? new Date(payment.refund_date).toLocaleDateString() : 'N/A'}</span>
-                </div>
-                ` : ''}
-                <div class="detail-row">
-                    <span class="label">Created:</span>
-                    <span class="value">${humanizeDate(payment.created_at)}</span>
-                </div>
-            </div>
-            
-            ${payment.notes ? `
-            <div class="payment-notes">
-                <span class="notes-label">Notes</span>
-                <span class="notes-value">${payment.notes}</span>
-            </div>
-            ` : ''}
-            
-            <div class="payment-actions">
-                <button class="icon-btn edit-payment-btn" title="Edit" onclick="openEditModal(${payment.id})" ${payment.is_deleted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                    <i class="fas fa-edit"></i>
-                </button>
-                ${isAdmin ? `
-                <button class="icon-btn ${payment.is_deleted ? 'reactivate-payment-btn' : 'delete-payment-btn'}" title="${payment.is_deleted ? 'Reactivate' : 'Delete'}" onclick="openDeleteModal(${payment.id})">
-                    <i class="fas fa-${payment.is_deleted ? 'undo' : 'trash'}"></i>
-                </button>
-                ` : ''}
             </div>
         </div>
     `).join('');
@@ -375,4 +352,46 @@ function searchPayments(e) {
     );
     
     displayPaymentsAsCards(filteredPayments);
+}
+
+function openDetailsModal(paymentId) {
+    const payment = allPayments.find(p => p.id === paymentId);
+    if (!payment) return;
+    
+    document.getElementById('detailsInvoiceNumber').textContent = payment.invoice_number || 'N/A';
+    document.getElementById('detailsBookingCode').textContent = payment.booking_confirmation || 'N/A';
+    document.getElementById('detailsPaymentStatus').textContent = payment.payment_status?.charAt(0).toUpperCase() + payment.payment_status?.slice(1).toLowerCase() || 'Pending';
+    document.getElementById('detailsPaymentMethod').textContent = payment.method || 'N/A';
+    document.getElementById('detailsAmount').textContent = '₦' + parseFloat(payment.amount).toLocaleString();
+    document.getElementById('detailsTransactionID').textContent = payment.transaction_id || 'N/A';
+    document.getElementById('detailsReceiptNumber').textContent = payment.receipt_number || 'N/A';
+    document.getElementById('detailsCreatedDate').textContent = payment.created_at ? new Date(payment.created_at).toLocaleDateString() : 'N/A';
+    
+    if (payment.reference) {
+        document.getElementById('detailsReferenceSection').style.display = 'block';
+        document.getElementById('detailsReference').textContent = payment.reference;
+    } else {
+        document.getElementById('detailsReferenceSection').style.display = 'none';
+    }
+    
+    if (payment.refund_amount > 0) {
+        document.getElementById('detailsRefundSection').style.display = 'block';
+        document.getElementById('detailsRefundAmount').textContent = '₦' + parseFloat(payment.refund_amount).toLocaleString();
+        document.getElementById('detailsRefundDate').textContent = payment.refund_date ? new Date(payment.refund_date).toLocaleDateString() : 'N/A';
+    } else {
+        document.getElementById('detailsRefundSection').style.display = 'none';
+    }
+    
+    if (payment.notes) {
+        document.getElementById('detailsNotesSection').style.display = 'block';
+        document.getElementById('detailsNotes').textContent = payment.notes;
+    } else {
+        document.getElementById('detailsNotesSection').style.display = 'none';
+    }
+    
+    document.getElementById('detailsPaymentModal').classList.add('active');
+}
+
+function closeDetailsModal() {
+    document.getElementById('detailsPaymentModal').classList.remove('active');
 }

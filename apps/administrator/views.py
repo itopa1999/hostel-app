@@ -13,11 +13,13 @@ from apps.administrator.BBL.Commands.guest_profile_command import GuestProfileCo
 from apps.administrator.BBL.Commands.booking_command import BookingCommand
 from apps.administrator.BBL.Commands.invoice_command import InvoiceCommand
 from apps.administrator.BBL.Commands.payment_command import PaymentCommand
+from apps.administrator.BBL.Commands.backup_command import BackupCommand
 from apps.hostel.BBL.Commands.report_command import ReportCommand
 from apps.hostel.BBL.Commands.setting_command import SettingCommand as SettingCommandClass
 from apps.hostel.BBL.Queries.setting_query import SettingQuery
 from apps.administrator.serializers import *
 from apps.hostel.BBL.Queries.dashboard_query import DashboardQuery
+from apps.administrator.BBL.Queries.backup_query import BackupQuery, AuditLogQuery
 from apps.hostel.BBL.Queries.hotel_query import HotelQuery
 from apps.hostel.BBL.Queries.floor_query import FloorQuery
 from apps.hostel.BBL.Queries.room_type_query import RoomTypeQuery
@@ -32,8 +34,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from apps.administrator.BBL.Commands.user_command import UserCommand
 from utils.base_result import BaseResultWithData
-from apps.administrator.models import Backup, AuditLog
-from apps.administrator.tasks import generate_backup_csv
 # Create your views here.
 
 User = get_user_model()
@@ -199,7 +199,7 @@ class RoomTypeDeleteAPIView(generics.GenericAPIView):
 
 
 class RoomCreateAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticatedAndNotDeleted]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = RoomSerializer
     def post(self, request):
         result = RoomCommand.Create(request.data, request.user)
@@ -231,7 +231,7 @@ class RoomDetailAPIView(generics.GenericAPIView):
 
 
 class RoomDeleteAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticatedAndNotDeleted]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = RoomSerializer
     def delete(self, request, room_id):
         result = RoomCommand.ToggleDelete(room_id, request.user)
@@ -317,7 +317,7 @@ class BookingDetailAPIView(generics.GenericAPIView):
 
 
 class BookingToggleDeleteAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticatedAndNotDeleted]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = BookingSerializer
     
     def delete(self, request, booking_id):
@@ -326,7 +326,7 @@ class BookingToggleDeleteAPIView(generics.GenericAPIView):
 
 
 class BookingCheckInAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     serializer_class = BookingSerializer
     
     def post(self, request, booking_id):
@@ -391,7 +391,7 @@ class PaymentUpdateStatusAPIView(generics.GenericAPIView):
 
 
 class PaymentToggleDeleteAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticatedAndNotDeleted]
+    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     serializer_class = PaymentSerializer
     
     def delete(self, request, payment_id):
@@ -401,7 +401,7 @@ class PaymentToggleDeleteAPIView(generics.GenericAPIView):
 
 # Report endpoints
 class OccupancyReportAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     
     def get(self, request):
         date = request.query_params.get('date', None)
@@ -410,7 +410,7 @@ class OccupancyReportAPIView(generics.GenericAPIView):
 
 
 class RevenueReportAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     
     def get(self, request):
         date = request.query_params.get('date', None)
@@ -419,7 +419,7 @@ class RevenueReportAPIView(generics.GenericAPIView):
 
 
 class SalesReportAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     
     def get(self, request):
         date = request.query_params.get('date', None)
@@ -428,7 +428,7 @@ class SalesReportAPIView(generics.GenericAPIView):
 
 
 class ExportReportAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
+    permission_classes = [IsAuthenticatedAndNotDeleted]
     
     def get(self, request):
         date = request.query_params.get('date', None)
@@ -469,37 +469,8 @@ class CreateBackupAPIView(generics.GenericAPIView):
         start_date = serializer.validated_data['start_date']
         end_date = serializer.validated_data['end_date']
         
-        try:
-            # Create backup record
-            backup_name = f"Backup_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}"
-            backup = Backup.objects.create(
-                backup_name=backup_name,
-                start_date=start_date,
-                end_date=end_date,
-                requested_by=request.user,
-                status='pending'
-            )
-            
-            # Trigger background task
-            generate_backup_csv.delay(backup.id)
-            
-            return Response(
-                {
-                    'is_success': True,
-                    'message': 'Backup request created successfully. Processing in background...',
-                    'data': BackupSerializer(backup).data
-                },
-                status=status.HTTP_201_CREATED
-            )
-        except Exception as e:
-            return Response(
-                {
-                    'is_success': False,
-                    'message': 'Failed to create backup request',
-                    'error': str(e)
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        result = BackupCommand.Create(start_date=start_date, end_date=end_date, user=request.user)
+        return Response(result.to_dict(), status=result.status_code)
 
 
 class BackupListAPIView(generics.GenericAPIView):
@@ -508,28 +479,8 @@ class BackupListAPIView(generics.GenericAPIView):
     serializer_class = BackupSerializer
     
     def get(self, request):
-        try:
-            backups = Backup.objects.all().order_by('-created_at')
-            serializer = self.get_serializer(backups, many=True)
-            
-            return Response(
-                {
-                    'is_success': True,
-                    'message': 'Backups retrieved successfully',
-                    'data': serializer.data,
-                    'count': backups.count()
-                },
-                status=status.HTTP_200_OK
-            )
-        except Exception as e:
-            return Response(
-                {
-                    'is_success': False,
-                    'message': 'Failed to retrieve backups',
-                    'error': str(e)
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        result = BackupQuery.GetAll()
+        return Response(result.to_dict(), status=result.status_code)
 
 
 class BackupDetailAPIView(generics.GenericAPIView):
@@ -538,35 +489,8 @@ class BackupDetailAPIView(generics.GenericAPIView):
     serializer_class = BackupSerializer
     
     def get(self, request, backup_id):
-        try:
-            backup = Backup.objects.get(id=backup_id)
-            serializer = self.get_serializer(backup)
-            
-            return Response(
-                {
-                    'is_success': True,
-                    'message': 'Backup retrieved successfully',
-                    'data': serializer.data
-                },
-                status=status.HTTP_200_OK
-            )
-        except Backup.DoesNotExist:
-            return Response(
-                {
-                    'is_success': False,
-                    'message': 'Backup not found'
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
-        except Exception as e:
-            return Response(
-                {
-                    'is_success': False,
-                    'message': 'Failed to retrieve backup',
-                    'error': str(e)
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        result = BackupQuery.GetById(backup_id)
+        return Response(result.to_dict(), status=result.status_code)
 
 
 class DownloadBackupAPIView(generics.GenericAPIView):
@@ -574,44 +498,22 @@ class DownloadBackupAPIView(generics.GenericAPIView):
     permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     
     def get(self, request, backup_id):
-        import os
         from django.http import FileResponse
         
+        result = BackupCommand.Download(backup_id, user=request.user)
+        
+        if not result.is_success:
+            return Response(result.to_dict(), status=result.status_code)
+        
         try:
-            backup = Backup.objects.get(id=backup_id)
-            
-            if backup.status != 'completed':
-                return Response(
-                    {
-                        'is_success': False,
-                        'message': f'Backup is still {backup.status}'
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            file_path = backup.file_path
-            if not os.path.exists(file_path):
-                return Response(
-                    {
-                        'is_success': False,
-                        'message': 'Backup file not found'
-                    },
-                    status=status.HTTP_404_NOT_FOUND
-                )
+            file_path = result.data['file_path']
+            backup_name = result.data['backup_name']
             
             file = open(file_path, 'rb')
             return FileResponse(
                 file,
                 as_attachment=True,
-                filename=f"{backup.backup_name}.csv"
-            )
-        except Backup.DoesNotExist:
-            return Response(
-                {
-                    'is_success': False,
-                    'message': 'Backup not found'
-                },
-                status=status.HTTP_404_NOT_FOUND
+                filename=f"{backup_name}.csv"
             )
         except Exception as e:
             return Response(
@@ -629,83 +531,11 @@ class AuditLogListAPIView(generics.GenericAPIView):
     permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     
     def get(self, request):
-        from django.utils import timezone
-        from datetime import timedelta
+        start_date = request.query_params.get('start_date', None)
+        end_date = request.query_params.get('end_date', None)
         
-        try:
-            # Get date range from query parameters
-            start_date_str = request.query_params.get('start_date', None)
-            end_date_str = request.query_params.get('end_date', None)
-            
-            # Build query
-            query = AuditLog.objects.all().order_by('-created_at')
-            
-            # Apply date filters if provided
-            if start_date_str and end_date_str:
-                try:
-                    from datetime import datetime
-                    start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-                    end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
-                    
-                    # Make dates timezone-aware
-                    start_date = timezone.make_aware(
-                        datetime.combine(start_date.date(), datetime.min.time())
-                    )
-                    end_date = timezone.make_aware(
-                        datetime.combine(end_date.date(), datetime.max.time())
-                    )
-                    
-                    query = query.filter(created_at__gte=start_date, created_at__lte=end_date)
-                except ValueError:
-                    pass
-            else:
-                # Default: show today's audits
-                today = timezone.now().date()
-                start_of_day = timezone.make_aware(
-                    datetime.combine(today, datetime.min.time())
-                )
-                end_of_day = timezone.make_aware(
-                    datetime.combine(today, datetime.max.time())
-                )
-                query = query.filter(created_at__gte=start_of_day, created_at__lte=end_of_day)
-            
-            audits = query[:1000]  # Limit to 1000 records for performance
-            
-            # Serialize data
-            audit_data = []
-            for audit in audits:
-                audit_data.append({
-                    'id': audit.id,
-                    'action': audit.action,
-                    'entity': audit.entity,
-                    'status': audit.status,
-                    'description': audit.description,
-                    'performed_by': audit.performed_by.username if audit.performed_by else 'System',
-                    'target_user': audit.target_user.username if audit.target_user else None,
-                    'old_values': audit.old_values,
-                    'new_values': audit.new_values,
-                    'metadata': audit.metadata,
-                    'created_at': audit.created_at.isoformat(),
-                })
-            
-            return Response(
-                {
-                    'is_success': True,
-                    'message': 'Audit logs retrieved successfully',
-                    'data': audit_data,
-                    'count': len(audit_data)
-                },
-                status=status.HTTP_200_OK
-            )
-        except Exception as e:
-            return Response(
-                {
-                    'is_success': False,
-                    'message': 'Failed to retrieve audit logs',
-                    'error': str(e)
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        result = AuditLogQuery.GetAll(start_date=start_date, end_date=end_date)
+        return Response(result.to_dict(), status=result.status_code)
 
 
 class AuditLogDetailAPIView(generics.GenericAPIView):
@@ -713,47 +543,5 @@ class AuditLogDetailAPIView(generics.GenericAPIView):
     permission_classes = [IsAuthenticatedAndNotDeleted, IsAdminPermission]
     
     def get(self, request, audit_id):
-        try:
-            audit = AuditLog.objects.get(id=audit_id)
-            
-            audit_data = {
-                'id': audit.id,
-                'action': audit.action,
-                'entity': audit.entity,
-                'status': audit.status,
-                'description': audit.description,
-                'performed_by': audit.performed_by.username if audit.performed_by else 'System',
-                'performed_by_id': audit.performed_by.id if audit.performed_by else None,
-                'target_user': audit.target_user.username if audit.target_user else None,
-                'target_user_id': audit.target_user.id if audit.target_user else None,
-                'old_values': audit.old_values,
-                'new_values': audit.new_values,
-                'metadata': audit.metadata,
-                'created_at': audit.created_at.isoformat(),
-            }
-            
-            return Response(
-                {
-                    'is_success': True,
-                    'message': 'Audit log retrieved successfully',
-                    'data': audit_data
-                },
-                status=status.HTTP_200_OK
-            )
-        except AuditLog.DoesNotExist:
-            return Response(
-                {
-                    'is_success': False,
-                    'message': 'Audit log not found'
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
-        except Exception as e:
-            return Response(
-                {
-                    'is_success': False,
-                    'message': 'Failed to retrieve audit log',
-                    'error': str(e)
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        result = AuditLogQuery.GetById(audit_id)
+        return Response(result.to_dict(), status=result.status_code)

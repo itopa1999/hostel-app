@@ -177,6 +177,82 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Guest Details Modal -->
+            <div class="modal" id="detailsGuestModal">
+                <div class="modal-content modal-medium">
+                    <div class="modal-header">
+                        <h2 id="detailsGuestName">Guest Details</h2>
+                        <button class="modal-close" id="closeDetailsModal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; font-weight: 600;">Email</label>
+                                <p id="detailsGuestEmail" style="font-size: 1rem; font-weight: 500;">N/A</p>
+                            </div>
+                            <div>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; font-weight: 600;">Phone</label>
+                                <p id="detailsGuestPhone" style="font-size: 1rem; font-weight: 500;">N/A</p>
+                            </div>
+                            <div>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; font-weight: 600;">Nationality</label>
+                                <p id="detailsGuestNationality" style="font-size: 1rem; font-weight: 500;">N/A</p>
+                            </div>
+                            <div>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; font-weight: 600;">Total Stays</label>
+                                <p id="detailsGuestTotalStays" style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">0</p>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Address</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Street Address</label>
+                                    <p id="detailsGuestAddress" style="font-size: 0.95rem;">Not provided</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">City</label>
+                                    <p id="detailsGuestCity" style="font-size: 0.95rem;">Not provided</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Country</label>
+                                    <p id="detailsGuestCountry" style="font-size: 0.95rem;">Not provided</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Postal Code</label>
+                                    <p id="detailsGuestPostalCode" style="font-size: 0.95rem;">Not provided</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Visit History</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">First Visit</label>
+                                    <p id="detailsGuestFirstVisit" style="font-size: 0.95rem;">Not booked yet</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.25rem;">Registered</label>
+                                    <p id="detailsGuestRegistered" style="font-size: 0.95rem;">N/A</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; font-weight: 600;">Notes</label>
+                            <div id="detailsGuestNotes"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeDetailsModal()">Close</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <script src="js/main.js"></script>
