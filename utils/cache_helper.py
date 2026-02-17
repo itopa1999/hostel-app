@@ -2,6 +2,7 @@ from django.core.cache import cache
 from django.conf import settings
 
 CACHE_TTL = getattr(settings, "CACHE_TTL", 60 * 60 * 24)  # 1 day fallback
+INVOICE_CACHE_TTL = 6 * 60 * 60  # 6 hours for invoice cache
 
 
 class GlobalCache:

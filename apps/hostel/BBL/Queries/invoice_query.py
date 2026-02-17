@@ -3,7 +3,7 @@ from datetime import date
 from apps.hostel.models import Invoice
 from apps.hostel.serializers import InvoiceSerializer
 from utils.base_result import BaseResultWithData
-from utils.cache_helper import GlobalCache
+from utils.cache_helper import GlobalCache, INVOICE_CACHE_TTL
 from utils.enums import CacheKeys
 
 
@@ -31,8 +31,8 @@ class InvoiceQuery:
                 item['today'] = today
                 data_with_date.append(item)
             
-            # Cache the result
-            GlobalCache.set(CacheKeys.INVOICE_ALL.value, data_with_date)
+            # Cache the result with 6-hour TTL
+            GlobalCache.set(CacheKeys.INVOICE_ALL.value, data_with_date, timeout=INVOICE_CACHE_TTL)
             
             return BaseResultWithData(
                 data=data_with_date,
@@ -62,8 +62,8 @@ class InvoiceQuery:
             invoice = Invoice.objects.get(id=invoice_id)
             serializer = InvoiceSerializer(invoice)
             
-            # Cache the result
-            GlobalCache.set(cache_key, serializer.data)
+            # Cache the result with 6-hour TTL
+            GlobalCache.set(cache_key, serializer.data, timeout=INVOICE_CACHE_TTL)
             
             return BaseResultWithData(
                 data=serializer.data,
