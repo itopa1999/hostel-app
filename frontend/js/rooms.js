@@ -155,10 +155,10 @@ function displayRoomsAsCards(rooms) {
         container.style.justifyContent = 'center';
         container.style.minHeight = '400px';
         container.innerHTML = `
-            <div style="text-align: center; color: var(--text-muted); padding: 3rem;">
-                <i class="fas fa-door-open" style="font-size: 3rem; margin-bottom: 1rem; display: block; color: var(--text-muted);"></i>
-                <p style="font-size: 1.1rem; margin-bottom: 1rem;">No rooms found</p>
-                <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Create a new room to get started.</p>
+            <div class="empty-state">
+                <i class="empty-state-icon fas fa-door-open"></i>
+                <p class="empty-state-title">No rooms found</p>
+                <p class="empty-state-subtitle">Create a new room to get started.</p>
                 <button class="btn btn-primary" onclick="openCreateModal()"><i class="fas fa-plus" style="margin-right: 0.5rem;"></i>Create Room</button>
             </div>
         `;
@@ -166,14 +166,14 @@ function displayRoomsAsCards(rooms) {
     }
     
     container.innerHTML = rooms.map(room => `
-        <div class="room-card" style="${room.is_deleted ? 'opacity: 0.6; border: 2px solid #ff6b6b;' : ''}">
+        <div class="room-card ${room.is_deleted ? 'deleted-item' : ''}">
             <div class="room-card-header">
-                <div class="room-number">Room ${room.number} ${room.is_deleted ? '<span style="color: #ff6b6b; font-size: 0.8em; margin-left: 0.5rem;">(Deleted)</span>' : ''}</div>
+                <div class="room-number">Room ${room.number} ${room.is_deleted ? '<span class="deleted-label" style="margin-left: 0.5rem;">(Deleted)</span>' : ''}</div>
                 <div class="status-badge status-${room.status?.toLowerCase()}">
                     <i class="fas fa-circle"></i>
                     ${room.status?.charAt(0).toUpperCase() + room.status?.slice(1).toLowerCase() || 'Available'}
                 </div>
-                <div class="room-actions" style="display: flex; gap: 0.5rem; margin-left: auto;">
+                <div class="room-actions flex-center" style="gap: 0.5rem; margin-left: auto;">
                     <button class="icon-btn" title="View Details" onclick="openDetailsModal(${room.id})" style="color: var(--primary-color);">
                         <i class="fas fa-eye"></i>
                     </button>
@@ -201,10 +201,10 @@ function displayRoomsAsCards(rooms) {
                     <span class="info-value">${room.max_occupancy || 0} Guests</span>
                 </div>
                 <div class="room-price">
-                    <div style="display: flex; align-items: baseline; gap: 0.25rem;">
+                    <div class="flex-baseline gap-small">
                         <span class="price-label">₦</span>
                         <span class="price-value">${room.price_override ? room.price_override.toLocaleString() : (room.base_price || 0).toLocaleString()}</span>
-                        ${room.price_override ? '<span class="price-override-badge" style="font-size: 0.7rem;">Override</span>' : ''}
+                        ${room.price_override ? '<span class="price-override-badge">Override</span>' : ''}
                     </div>
                 </div>
             </div>

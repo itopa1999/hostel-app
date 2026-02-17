@@ -113,10 +113,10 @@ function displayPaymentsAsCards(payments) {
         container.style.justifyContent = 'center';
         container.style.minHeight = '400px';
         container.innerHTML = `
-            <div style="text-align: center; color: var(--text-muted); padding: 3rem;">
-                <i class="fas fa-credit-card" style="font-size: 3rem; margin-bottom: 1rem; display: block; color: var(--text-muted);"></i>
-                <p style="font-size: 1.1rem; margin-bottom: 1rem;">No payments found</p>
-                <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Create a new payment to get started.</p>
+            <div class="empty-state">
+                <i class="empty-state-icon fas fa-credit-card"></i>
+                <p class="empty-state-title">No payments found</p>
+                <p class="empty-state-subtitle">Create a new payment to get started.</p>
                 <button class="btn btn-primary" onclick="openCreateModal()"><i class="fas fa-plus" style="margin-right: 0.5rem;"></i>Create Payment</button>
             </div>
         `;
@@ -125,10 +125,10 @@ function displayPaymentsAsCards(payments) {
     
     container.style.display = 'grid';
     container.innerHTML = payments.map(payment => `
-        <div class="payment-card" style="${payment.is_deleted ? 'opacity: 0.6; border: 2px solid #ff6b6b;' : ''}">
+        <div class="payment-card ${payment.is_deleted ? 'deleted-item' : ''}">
             <div class="payment-card-header">
                 <div class="payment-number">
-                    <span class="number-label">Invoice #${payment.invoice_number || 'N/A'}${payment.is_deleted ? ' <span style="color: #ff6b6b; font-size: 0.8em;">(Deleted)</span>' : ''}</span>
+                    <span class="number-label">Invoice #${payment.invoice_number || 'N/A'}${payment.is_deleted ? ' <span class="deleted-label">(Deleted)</span>' : ''}</span>
                 </div>
                 <div class="status-badge status-${payment.payment_status?.toLowerCase()}">
                     <i class="fas fa-circle"></i>

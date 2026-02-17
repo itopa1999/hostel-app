@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
@@ -330,6 +331,35 @@
                                         <div class="pill-content">
                                             <p class="pill-label">Cancelled</p>
                                             <p class="pill-value" id="cancelled-bookings">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Checkout Status Alerts -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Checkout Status</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="status-pills">
+                                    <div class="status-pill">
+                                        <div class="pill-icon" style="background-color: #fff3cd; color: #ffc107;">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="pill-content">
+                                            <p class="pill-label">Checkout Today</p>
+                                            <p class="pill-value" id="checkout-today-count">0</p>
+                                        </div>
+                                    </div>
+                                    <div class="status-pill">
+                                        <div class="pill-icon" style="background-color: #f8d7da; color: #dc3545;">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="pill-content">
+                                            <p class="pill-label">Checkout Overdue</p>
+                                            <p class="pill-value" id="checkout-overdue-count">0</p>
                                         </div>
                                     </div>
                                 </div>

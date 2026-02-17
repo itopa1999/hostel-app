@@ -164,21 +164,36 @@ function displayBookingsAsCards(bookings) {
         container.style.justifyContent = 'center';
         container.style.minHeight = '400px';
         container.innerHTML = `
-            <div style="text-align: center; color: var(--text-muted); padding: 3rem;">
-                <i class="fas fa-calendar-check" style="font-size: 3rem; margin-bottom: 1rem; display: block; color: var(--text-muted);"></i>
-                <p style="font-size: 1.1rem; margin-bottom: 1rem;">No bookings found</p>
-                <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Create a new booking to get started.</p>
+            <div class="empty-state">
+                <i class="empty-state-icon fas fa-calendar-check"></i>
+                <p class="empty-state-title">No bookings found</p>
+                <p class="empty-state-subtitle">Create a new booking to get started.</p>
                 <button class="btn btn-primary" onclick="openCreateModal()"><i class="fas fa-plus" style="margin-right: 0.5rem;"></i>Create Booking</button>
             </div>
         `;
         return;
     }
     
-    container.innerHTML = bookings.map(booking => `
-        <div class="booking-card" style="${booking.is_deleted ? 'opacity: 0.6; border: 2px solid #ff6b6b;' : ''}">
+    container.innerHTML = bookings.map(booking => {
+        // Determine checkout alert styling and message
+        let checkoutAlert = '';
+        if (booking.checkout_status === 'TODAY') {
+            checkoutAlert = `<div class="checkout-alert checkout-alert-today">
+                <i class="fas fa-clock"></i>
+                <strong>Checkout Today!</strong> Guest checkout is due today.
+            </div>`;
+        } else if (booking.checkout_status === 'OVERDUE') {
+            checkoutAlert = `<div class="checkout-alert checkout-alert-overdue">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Checkout Overdue!</strong> Guest checkout date has passed. Please follow up.
+            </div>`;
+        }
+        
+        return `
+        <div class="booking-card ${booking.is_deleted ? 'deleted-item' : ''}">
             <div class="booking-card-header">
                 <div class="booking-code">
-                    <span class="code-label">${booking.confirmation_code || 'N/A'}${booking.is_deleted ? ' <span style="color: #ff6b6b; font-size: 0.8em;">(Deleted)</span>' : ''}</span>
+                    <span class="code-label">${booking.confirmation_code || 'N/A'}${booking.is_deleted ? ' <span class="deleted-label">(Deleted)</span>' : ''}</span>
                 </div>
                 <div class="status-badge status-${booking.status?.toLowerCase()}">
                     <i class="fas fa-circle"></i>
@@ -198,6 +213,7 @@ function displayBookingsAsCards(bookings) {
                     ` : ''}
                 </div>
             </div>
+            ${checkoutAlert}
             <div class="booking-card-body">
                 <div class="booking-info">
                     <span class="info-label">Guest:</span>
@@ -219,7 +235,7 @@ function displayBookingsAsCards(bookings) {
                 </div>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function openDetailsModal(bookingId) {

@@ -69,6 +69,19 @@ class BookingStatus(Enum):
         return [(status.value, status.value.replace('_', ' ').title()) for status in cls]
 
 
+class CheckoutStatus(Enum):
+    """Checkout reminder status for bookings"""
+    ON_TIME = "ON_TIME"  # Checkout date is in the future
+    TODAY = "TODAY"  # Checkout date is today
+    OVERDUE = "OVERDUE"  # Checkout date has passed
+    CHECKED_OUT = "CHECKED_OUT"  # Already checked out
+    
+    @classmethod
+    def choices(cls):
+        """Return choices for Django model field"""
+        return [(status.value, status.value.title()) for status in cls]
+
+
 class PaymentMethod(Enum):
     """Payment method types"""
     CASH = "CASH"

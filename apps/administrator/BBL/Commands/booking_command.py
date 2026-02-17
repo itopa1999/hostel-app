@@ -3,9 +3,11 @@ from http import HTTPStatus
 from apps.hostel.models import Booking, GuestProfile
 from apps.hostel.serializers import BookingSerializer
 from utils.base_result import BaseResultWithData
+from utils.enums import CacheKeys
 from utils.log_helpers import OperationLogger
 from utils.audit.audit_logger import AuditLogger
 from utils.serialization_helpers import serialize_for_audit
+from utils.cache_helper import GlobalCache
 
 
 class BookingCommand:
@@ -302,6 +304,22 @@ class BookingCommand:
                 message="This booking is deleted and cannot be updated until it is restored"
             )
         
+        # Check if payment is completed - prevent updates to critical fields
+        from utils.enums import PaymentStatus
+        invoice = booking.invoice
+        if invoice and invoice.payment_status == PaymentStatus.COMPLETED.value:
+            # List of fields that cannot be updated after payment
+            restricted_fields = ['check_in', 'check_out', 'room', 'number_of_guests', 'guest' 'status']
+            restricted_data = {key: value for key, value in data.items() if key in restricted_fields}
+            
+            if restricted_data:
+                op.fail(f"Cannot update booking after payment is completed. Restricted fields: {', '.join(restricted_data.keys())}")
+                return BaseResultWithData(
+                    data=None,
+                    status_code=HTTPStatus.BAD_REQUEST,
+                    message="Payment has been completed. You cannot modify booking dates, room, number of guests, or guest details to prevent fraud"
+                )
+        
         # Check if guest is being updated and if it's deleted
         if 'guest' in data:
             try:
@@ -578,6 +596,11 @@ class BookingCommand:
             room.save()
             op.success(f"Room {room.number} status updated to OCCUPIED")
             
+            # Invalidate invoice and payment cache
+            GlobalCache.delete(CacheKeys.INVOICE_ALL.value)
+            GlobalCache.delete(CacheKeys.PAYMENT_ALL.value)
+            op.success("Invalidated invoice and payment cache")
+            
             AuditLogger.log_update(
                 Booking.__name__,
                 performed_by=user,
@@ -594,6 +617,90 @@ class BookingCommand:
             )
         except Exception as e:
             op.fail(f"Failed to check in guest: {str(e)}", exc=e)
+            return BaseResultWithData(
+                data=None,
+                status_code=HTTPStatus.BAD_REQUEST,
+                message=str(e)
+            )
+
+    
+    @staticmethod
+    def CheckOut(booking_id, user=None):
+        """Check out a guest - updates booking status to CHECKED_OUT and room to AVAILABLE"""
+        op = OperationLogger("BookingCommand.CheckOut", booking_id=booking_id)
+        op.start()
+        
+        try:
+            booking = Booking.objects.get(id=booking_id)
+        except Booking.DoesNotExist:
+            op.fail(f"Booking with id {booking_id} not found")
+            return BaseResultWithData(
+                data=None,
+                status_code=HTTPStatus.NOT_FOUND,
+                message="Booking not found"
+            )
+        
+        if booking.is_deleted:
+            op.fail(f"Booking {booking.confirmation_code} is deleted")
+            return BaseResultWithData(
+                data=None,
+                status_code=HTTPStatus.BAD_REQUEST,
+                message="This booking is deleted and cannot be used for check-out"
+            )
+        
+        try:
+            from utils.enums import BookingStatus, RoomStatus
+            
+            # Check if booking is already checked out
+            if booking.status == BookingStatus.CHECKED_OUT.value:
+                op.fail(f"Booking {booking.confirmation_code} already checked out")
+                return BaseResultWithData(
+                    data=None,
+                    status_code=HTTPStatus.BAD_REQUEST,
+                    message="Guest has already checked out"
+                )
+            
+            # Check if booking is cancelled
+            if booking.status == BookingStatus.CANCELLED.value:
+                op.fail(f"Booking {booking.confirmation_code} is cancelled, cannot checkout")
+                return BaseResultWithData(
+                    data=None,
+                    status_code=HTTPStatus.BAD_REQUEST,
+                    message="This booking is cancelled and cannot be checked out"
+                )
+            
+            # All checks passed - proceed with check-out
+            booking.status = BookingStatus.CHECKED_OUT.value
+            booking.save()
+            op.success(f"Booking {booking.confirmation_code} status updated to CHECKED_OUT")
+            
+            # Update room to AVAILABLE
+            room = booking.room
+            room.status = RoomStatus.AVAILABLE.value
+            room.save()
+            op.success(f"Room {room.number} status updated to AVAILABLE")
+            
+            # Invalidate invoice and payment cache
+            GlobalCache.delete(CacheKeys.INVOICE_ALL.value)
+            GlobalCache.delete(CacheKeys.PAYMENT_ALL.value)
+            op.success(f"Invalidated invoice and payment cache")
+            
+            AuditLogger.log_update(
+                Booking.__name__,
+                performed_by=user,
+                old_values={"status": booking.status},
+                new_values={"status": BookingStatus.CHECKED_OUT.value},
+                metadata=serialize_for_audit({"room_id": room.id})
+            )
+            
+            result_serializer = BookingSerializer(booking)
+            return BaseResultWithData(
+                data=result_serializer.data,
+                status_code=HTTPStatus.OK,
+                message="Guest checked out successfully and room is now available"
+            )
+        except Exception as e:
+            op.fail(f"Failed to check out guest: {str(e)}", exc=e)
             return BaseResultWithData(
                 data=None,
                 status_code=HTTPStatus.BAD_REQUEST,

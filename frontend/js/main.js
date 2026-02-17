@@ -398,9 +398,14 @@ const username = CookieManager.get('admin_username')
 const userGroup = CookieManager.get('user_group')
 const userSpan = document.querySelector('profile-name');
 const userRoleSpan = document.querySelector('.profile-role');
+const userAvatarSpan = document.querySelector('.profile-avatar');
 
 if (username && userSpan) {
     userSpan.innerHTML = username;
+}
+
+if (userAvatarSpan) {
+    userAvatarSpan.src = '/img/avatar.jpeg';
 }
 
 if (userGroup && userRoleSpan) {

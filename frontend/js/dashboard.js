@@ -137,6 +137,19 @@ function populateDashboard(dashboardData) {
     document.getElementById('checked-out-bookings').textContent = dashboardData.booking_status.checked_out;
     document.getElementById('cancelled-bookings').textContent = dashboardData.booking_status.cancelled;
     
+    // Checkout Status Alerts (if available)
+    if (dashboardData.checkout_status) {
+        const checkoutTodayEl = document.getElementById('checkout-today-count');
+        const checkoutOverdueEl = document.getElementById('checkout-overdue-count');
+        
+        if (checkoutTodayEl) {
+            checkoutTodayEl.textContent = dashboardData.checkout_status.today;
+        }
+        if (checkoutOverdueEl) {
+            checkoutOverdueEl.textContent = dashboardData.checkout_status.overdue;
+        }
+    }
+    
     // Payment Status
     document.getElementById('pending-payment-stat').textContent = dashboardData.payment_status.pending;
     document.getElementById('completed-payment').textContent = dashboardData.payment_status.completed;

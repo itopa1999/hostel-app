@@ -85,11 +85,11 @@ function displayOccupancyReport(report) {
     let roomTypesHTML = '';
     if (report.room_types_breakdown && report.room_types_breakdown.length > 0) {
         roomTypesHTML = report.room_types_breakdown.map(rt => `
-            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="breakdown-container">
+                <div class="breakdown-header">
                     <div>
-                        <p style="font-weight: 600; margin-bottom: 0.25rem;">${rt.room_type}</p>
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">Total: ${rt.total} | Occupied: ${rt.occupied} | Available: ${rt.available}</p>
+                        <p class="breakdown-title">${rt.room_type}</p>
+                        <p class="breakdown-subtitle">Total: ${rt.total} | Occupied: ${rt.occupied} | Available: ${rt.available}</p>
                     </div>
                     <span class="badge checked-in">${formatPercentage(rt.occupancy_rate)}</span>
                 </div>
@@ -98,31 +98,31 @@ function displayOccupancyReport(report) {
     }
     
     output.innerHTML = `
-        <div>
-            <h3 style="margin-bottom: 1rem; color: var(--primary);">📊 Occupancy Report</h3>
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">Report Date: <strong>${report.report_date}</strong></p>
+        <div class="report-output-container">
+            <h3 class="report-title">📊 Occupancy Report</h3>
+            <p class="report-date-text">Report Date: <strong>${report.report_date}</strong></p>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-                <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Total Rooms</p>
-                    <p style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">${report.total_rooms}</p>
+            <div class="report-cards-grid">
+                <div class="report-card">
+                    <p class="report-card-label">Total Rooms</p>
+                    <p class="report-card-value">${report.total_rooms}</p>
                 </div>
-                <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Occupied</p>
-                    <p style="font-size: 1.8rem; font-weight: 700; color: #ff9800;">${report.occupied_rooms}</p>
+                <div class="report-card">
+                    <p class="report-card-label">Occupied</p>
+                    <p class="report-card-value occupied">${report.occupied_rooms}</p>
                 </div>
-                <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Available</p>
-                    <p style="font-size: 1.8rem; font-weight: 700; color: #4caf50;">${report.available_rooms}</p>
+                <div class="report-card">
+                    <p class="report-card-label">Available</p>
+                    <p class="report-card-value available">${report.available_rooms}</p>
                 </div>
-                <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Occupancy Rate</p>
-                    <p style="font-size: 1.8rem; font-weight: 700; color: var(--success);">${formatPercentage(report.occupancy_rate)}</p>
+                <div class="report-card">
+                    <p class="report-card-label">Occupancy Rate</p>
+                    <p class="report-card-value success">${formatPercentage(report.occupancy_rate)}</p>
                 </div>
             </div>
             
             ${roomTypesHTML ? `
-                <h4 style="margin-top: 1.5rem; margin-bottom: 1rem;">Room Type Breakdown</h4>
+                <h4 class="report-section-header">Room Type Breakdown</h4>
                 ${roomTypesHTML}
             ` : ''}
         </div>
@@ -163,11 +163,11 @@ function displayRevenueReport(report) {
     let roomTypesHTML = '';
     if (report.room_type_breakdown && report.room_type_breakdown.length > 0) {
         roomTypesHTML = report.room_type_breakdown.map(rt => `
-            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="breakdown-container">
+                <div class="breakdown-header">
                     <div>
-                        <p style="font-weight: 600; margin-bottom: 0.25rem;">${rt.room_type}</p>
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">Bookings: ${rt.number_of_bookings}</p>
+                        <p class="breakdown-title">${rt.room_type}</p>
+                        <p class="breakdown-subtitle">Bookings: ${rt.number_of_bookings}</p>
                     </div>
                     <span class="badge" style="background: var(--primary); color: white;">${formatCurrency(rt.total_revenue)}</span>
                 </div>
@@ -176,35 +176,35 @@ function displayRevenueReport(report) {
     }
     
     output.innerHTML = `
-        <div>
-            <h3 style="margin-bottom: 1rem; color: var(--primary);">💰 Revenue Report</h3>
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">Report Date: <strong>${report.report_date}</strong></p>
+        <div class="report-output-container">
+            <h3 class="report-title">💰 Revenue Report</h3>
+            <p class="report-date-text">Report Date: <strong>${report.report_date}</strong></p>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-                <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Completed Bookings</p>
-                    <p style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">${report.total_completed_bookings}</p>
+            <div class="report-cards-grid wide">
+                <div class="report-card">
+                    <p class="report-card-label">Completed Bookings</p>
+                    <p class="report-card-value">${report.total_completed_bookings}</p>
                 </div>
-                <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Subtotal</p>
-                    <p style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); word-break: break-word;">${formatCurrency(report.total_subtotal)}</p>
+                <div class="report-card">
+                    <p class="report-card-label">Subtotal</p>
+                    <p class="report-card-value small break-word">${formatCurrency(report.total_subtotal)}</p>
                 </div>
-                <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Discount</p>
-                    <p style="font-size: 1.1rem; font-weight: 700; color: #ff6b6b; word-break: break-word;">-${formatCurrency(report.total_discount)}</p>
+                <div class="report-card">
+                    <p class="report-card-label">Discount</p>
+                    <p class="report-card-value small break-word" style="color: #ff6b6b;">-${formatCurrency(report.total_discount)}</p>
                 </div>
-                <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Tax</p>
-                    <p style="font-size: 1.1rem; font-weight: 700; color: #4caf50; word-break: break-word;">+${formatCurrency(report.total_tax)}</p>
+                <div class="report-card">
+                    <p class="report-card-label">Tax</p>
+                    <p class="report-card-value small break-word" style="color: #4caf50;">+${formatCurrency(report.total_tax)}</p>
                 </div>
-                <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); padding: 1rem; border-radius: 8px; text-align: center; color: white; grid-column: auto;">
-                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Total Revenue</p>
-                    <p style="font-size: 1.3rem; font-weight: 700; word-break: break-word;">${formatCurrency(report.total_revenue)}</p>
+                <div class="report-card-gradient">
+                    <p class="report-card-gradient-label">Total Revenue</p>
+                    <p class="report-card-gradient-value break-word">${formatCurrency(report.total_revenue)}</p>
                 </div>
             </div>
             
             ${roomTypesHTML ? `
-                <h4 style="margin-top: 1.5rem; margin-bottom: 1rem;">Revenue by Room Type</h4>
+                <h4 class="report-section-header">Revenue by Room Type</h4>
                 ${roomTypesHTML}
             ` : ''}
         </div>
@@ -245,11 +245,11 @@ function displaySalesReport(report) {
     let paymentMethodsHTML = '';
     if (report.payment_method_breakdown && report.payment_method_breakdown.length > 0) {
         paymentMethodsHTML = report.payment_method_breakdown.map(pm => `
-            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="breakdown-container">
+                <div class="breakdown-header">
                     <div>
-                        <p style="font-weight: 600; margin-bottom: 0.25rem;">${pm.payment_method}</p>
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">Transactions: ${pm.number_of_transactions}</p>
+                        <p class="breakdown-title">${pm.payment_method}</p>
+                        <p class="breakdown-subtitle">Transactions: ${pm.number_of_transactions}</p>
                     </div>
                     <span class="badge checked-in">${formatCurrency(pm.total_amount)}</span>
                 </div>
@@ -260,9 +260,9 @@ function displaySalesReport(report) {
     let statusHTML = '';
     if (report.new_bookings_by_status && report.new_bookings_by_status.length > 0) {
         statusHTML = report.new_bookings_by_status.map(bs => `
-            <div style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 8px; margin-bottom: 0.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <p style="font-weight: 600;">${bs.status}</p>
+            <div class="breakdown-container" style="padding: 0.75rem;">
+                <div class="breakdown-header">
+                    <p class="breakdown-title">${bs.status}</p>
                     <span class="badge">${bs.count}</span>
                 </div>
             </div>
@@ -270,32 +270,32 @@ function displaySalesReport(report) {
     }
     
     output.innerHTML = `
-        <div>
-            <h3 style="margin-bottom: 1rem; color: var(--primary);">📈 Sales Report</h3>
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">Report Date: <strong>${report.report_date}</strong></p>
+        <div class="report-output-container">
+            <h3 class="report-title">📈 Sales Report</h3>
+            <p class="report-date-text">Report Date: <strong>${report.report_date}</strong></p>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-                <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">New Bookings</p>
-                    <p style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">${report.new_bookings}</p>
+            <div class="report-cards-grid">
+                <div class="report-card">
+                    <p class="report-card-label">New Bookings</p>
+                    <p class="report-card-value">${report.new_bookings}</p>
                 </div>
-                <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center;">
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Completed Payments</p>
-                    <p style="font-size: 1.8rem; font-weight: 700; color: #4caf50;">${report.completed_payments}</p>
+                <div class="report-card">
+                    <p class="report-card-label">Completed Payments</p>
+                    <p class="report-card-value available">${report.completed_payments}</p>
                 </div>
-                <div style="background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); padding: 1rem; border-radius: 8px; text-align: center; color: white; grid-column: span 2;">
-                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Total Sales</p>
-                    <p style="font-size: 1.8rem; font-weight: 700;">${formatCurrency(report.total_sales)}</p>
+                <div class="report-card-gradient sales grid-span-2">
+                    <p class="report-card-gradient-label">Total Sales</p>
+                    <p class="report-card-gradient-value large">${formatCurrency(report.total_sales)}</p>
                 </div>
             </div>
             
             ${paymentMethodsHTML ? `
-                <h4 style="margin-top: 1.5rem; margin-bottom: 1rem;">Payment Methods</h4>
+                <h4 class="report-section-header">Payment Methods</h4>
                 ${paymentMethodsHTML}
             ` : ''}
             
             ${statusHTML ? `
-                <h4 style="margin-top: 1.5rem; margin-bottom: 1rem;">New Bookings by Status</h4>
+                <h4 class="report-section-header">New Bookings by Status</h4>
                 ${statusHTML}
             ` : ''}
         </div>
@@ -338,51 +338,51 @@ function displayExportReport(report) {
     const sales = report.sales_report;
     
     output.innerHTML = `
-        <div>
+        <div class="report-output-container">
             <h3 style="margin-bottom: 0.5rem; color: var(--primary);">📋 Comprehensive Export Report</h3>
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">Generated: <strong>${report.generated_at}</strong></p>
+            <p class="report-date-text">Generated: <strong>${report.generated_at}</strong></p>
             
             <!-- OCCUPANCY SECTION -->
-            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                <h4 style="margin-bottom: 0.75rem; color: var(--primary);">📊 Occupancy Summary</h4>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
-                    <div>
-                        <p style="color: var(--text-muted); font-size: 0.85rem;">Occupied Rooms</p>
-                        <p style="font-weight: 700;">${occupancy.occupied_rooms} / ${occupancy.total_rooms}</p>
+            <div class="export-section">
+                <h4 class="export-section-title">📊 Occupancy Summary</h4>
+                <div class="export-grid">
+                    <div class="export-grid-item">
+                        <p class="export-grid-item-label">Occupied Rooms</p>
+                        <p class="export-grid-item-value">${occupancy.occupied_rooms} / ${occupancy.total_rooms}</p>
                     </div>
-                    <div>
-                        <p style="color: var(--text-muted); font-size: 0.85rem;">Occupancy Rate</p>
-                        <p style="font-weight: 700; color: var(--primary);">${formatPercentage(occupancy.occupancy_rate)}</p>
+                    <div class="export-grid-item">
+                        <p class="export-grid-item-label">Occupancy Rate</p>
+                        <p class="export-grid-item-value primary">${formatPercentage(occupancy.occupancy_rate)}</p>
                     </div>
                 </div>
             </div>
             
             <!-- REVENUE SECTION -->
-            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                <h4 style="margin-bottom: 0.75rem; color: var(--primary);">💰 Revenue Summary</h4>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
-                    <div>
-                        <p style="color: var(--text-muted); font-size: 0.85rem;">Total Revenue</p>
-                        <p style="font-weight: 700; color: #4caf50;">${formatCurrency(revenue.total_revenue)}</p>
+            <div class="export-section">
+                <h4 class="export-section-title">💰 Revenue Summary</h4>
+                <div class="export-grid">
+                    <div class="export-grid-item">
+                        <p class="export-grid-item-label">Total Revenue</p>
+                        <p class="export-grid-item-value success">${formatCurrency(revenue.total_revenue)}</p>
                     </div>
-                    <div>
-                        <p style="color: var(--text-muted); font-size: 0.85rem;">Completed Bookings</p>
-                        <p style="font-weight: 700;">${revenue.total_completed_bookings}</p>
+                    <div class="export-grid-item">
+                        <p class="export-grid-item-label">Completed Bookings</p>
+                        <p class="export-grid-item-value">${revenue.total_completed_bookings}</p>
                     </div>
                 </div>
             </div>
             
             <!-- SALES SECTION -->
-            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px;">
-                <h4 style="margin-bottom: 0.75rem; color: var(--primary);">📈 Sales Summary</h4>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
-                    <div>
-                        <p style="color: var(--text-muted); font-size: 0.85rem;">New Bookings</p>
-                        <p style="font-weight: 700;">${sales.new_bookings}</p>
+            <div class="export-section">
+                <h4 class="export-section-title">📈 Sales Summary</h4>
+                <div class="export-grid">
+                    <div class="export-grid-item">
+                        <p class="export-grid-item-label">New Bookings</p>
+                        <p class="export-grid-item-value">${sales.new_bookings}</p>
                     </div>
-                    <div>
-                        <p style="color: var(--text-muted); font-size: 0.85rem;">Total Sales</p>
-                        <p style="font-weight: 700;">${formatCurrency(sales.total_sales)}</p>
+                    <div class="export-grid-item">
+                        <p class="export-grid-item-label">Total Sales</p>
+                        <p class="export-grid-item-value">${formatCurrency(sales.total_sales)}</p>
                     </div>
                 </div>
             </div>

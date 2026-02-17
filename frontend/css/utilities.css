@@ -1,0 +1,441 @@
+/* =====================================================
+   UTILITY CSS CLASSES - Common Styling Patterns
+   ===================================================== */
+
+/* ===== TEXT UTILITIES ===== */
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+.text-primary {
+    color: var(--primary);
+}
+
+.text-small {
+    font-size: 0.9rem;
+}
+
+.text-bold {
+    font-weight: 600;
+}
+
+.text-strikethrough {
+    text-decoration: line-through;
+}
+
+/* ===== LAYOUT UTILITIES ===== */
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-baseline {
+    display: flex;
+    align-items: baseline;
+}
+
+.flex-gap-sm {
+    gap: 0.25rem;
+}
+
+.flex-gap-md {
+    gap: 0.5rem;
+}
+
+.flex-gap-lg {
+    gap: 0.75rem;
+}
+
+.flex-gap-xl {
+    gap: 1rem;
+}
+
+.grid-2-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.grid-auto-fit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.grid-auto-fit-wide {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+/* ===== SPACING UTILITIES ===== */
+.mb-sm {
+    margin-bottom: 0.5rem;
+}
+
+.mb-md {
+    margin-bottom: 1rem;
+}
+
+.mb-lg {
+    margin-bottom: 1.5rem;
+}
+
+.mb-xl {
+    margin-bottom: 2rem;
+}
+
+.mt-sm {
+    margin-top: 0.5rem;
+}
+
+.mt-md {
+    margin-top: 1rem;
+}
+
+.mt-lg {
+    margin-top: 1.5rem;
+}
+
+.gap-md {
+    gap: 1rem;
+}
+
+.gap-sm {
+    gap: 0.5rem;
+}
+
+.gap-small {
+    gap: 0.25rem;
+}
+
+.gap-lg {
+    gap: 1.5rem;
+}
+
+.p-sm {
+    padding: 0.5rem;
+}
+
+.p-md {
+    padding: 0.75rem;
+}
+
+.p-lg {
+    padding: 1rem;
+}
+
+.p-xl {
+    padding: 1.5rem;
+}
+
+/* ===== PADDING/BORDER UTILITIES ===== */
+.input-control {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    width: 100%;
+    background-color: var(--bg-primary);
+    color: var(--text);
+}
+
+.input-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(110, 68, 255, 0.1);
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.form-helper-text {
+    color: var(--text-muted);
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+}
+
+/* ===== EMPTY STATE UTILITIES ===== */
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+    padding: 3rem;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+    color: var(--text-muted);
+}
+
+.empty-state-title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state-text {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+/* ===== BUTTON UTILITIES ===== */
+.btn-sm {
+    padding: 0.6rem 1.2rem;
+    gap: 0.5rem;
+}
+
+.btn-icon-only {
+    background: none;
+    border: none;
+    outline: none;
+}
+
+/* ===== DELETED STATE UTILITIES ===== */
+.deleted-item {
+    opacity: 0.6;
+    border: 2px solid #ff6b6b;
+}
+
+.deleted-badge {
+    color: #ff6b6b;
+    font-size: 0.8em;
+    margin-left: 0.5rem;
+}
+
+.deleted-label {
+    color: #ff6b6b;
+    font-size: 0.8em;
+}
+
+/* ===== BADGE UTILITIES ===== */
+.badge-base {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge-completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-failed {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.badge-refunded {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.badge-reserved {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.badge-checked-in {
+    background: #fff8dc;
+    color: #ff9800;
+}
+
+.badge-checked-out {
+    background: #d4edda;
+    color: #28a745;
+}
+
+.badge-cancelled {
+    background: #f8d7da;
+    color: #dc3545;
+}
+
+/* ===== MODAL UTILITIES ===== */
+.modal-header-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.modal-max-width-500 {
+    max-width: 500px;
+}
+
+.modal-max-width-600 {
+    max-width: 600px;
+}
+
+/* ===== PRICE UTILITIES ===== */
+.price-container {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+}
+
+.price-label {
+    font-size: 0.9rem;
+}
+
+.price-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.price-period {
+    font-size: 0.85rem;
+    margin-left: auto;
+}
+
+.price-override-badge {
+    background: rgba(110, 68, 255, 0.1);
+    color: var(--primary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* ===== CARD UTILITIES ===== */
+.card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.card-header-title {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+/* ===== STATUS INDICATORS ===== */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-circle {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* ===== ALERT/ALERT BOX UTILITIES ===== */
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #0c5460;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #ffc107;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #dc3545;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+}
+
+/* ===== VISIBILITY UTILITIES ===== */
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
+
+.opacity-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ===== RESPONSIVE UTILITIES ===== */
+@media (max-width: 768px) {
+    .grid-2-col {
+        grid-template-columns: 1fr;
+    }
+    
+    .flex-between {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+}
+/* ===== FORM & SETTINGS UTILITIES ===== */
+
+/* Form Label */
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* Form Helper Text */
+.form-helper-text {
+    color: var(--text-muted);
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.9rem;
+}
+
+/* Input Field */
+.input-field {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    width: 100%;
+}
+
+/* Modal Content Width */
+.settings-modal {
+    max-width: 500px;
+}

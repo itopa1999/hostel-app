@@ -132,6 +132,32 @@ class Booking(BaseModel):
 
     def __str__(self):
         return f"Booking {self.confirmation_code} - {self.guest.name}"
+    
+    def get_checkout_status(self):
+        """
+        Determine the checkout status for this booking.
+        Returns one of: ON_TIME, TODAY, OVERDUE, CHECKED_OUT, CANCELLED
+        """
+        from django.utils import timezone
+        from utils.enums import BookingStatus, CheckoutStatus
+        
+        # If cancelled, return CHECKED_OUT (no checkout alert needed)
+        if self.status == BookingStatus.CANCELLED.value:
+            return CheckoutStatus.CHECKED_OUT.value
+        
+        # If already checked out, return CHECKED_OUT
+        if self.status == BookingStatus.CHECKED_OUT.value:
+            return CheckoutStatus.CHECKED_OUT.value
+        
+        today = timezone.now().date()
+        days_until_checkout = (self.check_out - today).days
+        
+        if days_until_checkout > 0:
+            return CheckoutStatus.ON_TIME.value
+        elif days_until_checkout == 0:
+            return CheckoutStatus.TODAY.value
+        else:
+            return CheckoutStatus.OVERDUE.value
 
 
 class Invoice(BaseModel):
@@ -157,6 +183,16 @@ class Invoice(BaseModel):
 
     def __str__(self):
         return f"Invoice {self.invoice_number}"
+    
+    def get_checkout_status(self):
+        """
+        Get the checkout status from the related booking.
+        Returns the booking's checkout status directly.
+        """
+        if self.booking:
+            return self.booking.get_checkout_status()
+        return None
+
 
 
 class Payment(BaseModel):

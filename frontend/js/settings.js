@@ -171,7 +171,7 @@ function showSettingsModal(settings) {
     modal.className = 'modal active';
     
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content settings-modal">
             <div class="modal-header">
                 <h2>General Settings</h2>
                 <button class="modal-close" id="closeSettingsModal">
@@ -181,24 +181,22 @@ function showSettingsModal(settings) {
             <div class="modal-body">
                 <form id="generalSettingsForm">
                     <div class="form-group">
-                        <label for="taxPercentage" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Tax Percentage (%)</label>
+                        <label for="taxPercentage" class="form-label">Tax Percentage (%)</label>
                         <input type="number" id="taxPercentage" name="tax_percentage" step="0.01" min="0" max="100" 
-                               value="${settings.tax_percentage || 0}" class="form-control" 
-                               style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;">
-                        <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">e.g., 10 for 10%</small>
+                               value="${settings.tax_percentage || 0}" class="form-control input-field">
+                        <small class="form-helper-text">e.g., 10 for 10%</small>
                     </div>
                     <div class="form-group" style="margin-top: 1.5rem;">
-                        <label for="discountPercentage" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Default Discount Percentage (%)</label>
+                        <label for="discountPercentage" class="form-label">Default Discount Percentage (%)</label>
                         <input type="number" id="discountPercentage" name="default_discount_percentage" step="0.01" min="0" max="100" 
-                               value="${settings.default_discount_percentage || 0}" class="form-control" 
-                               style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;">
-                        <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">e.g., 5 for 5%</small>
+                               value="${settings.default_discount_percentage || 0}" class="form-control input-field">
+                        <small class="form-helper-text">e.g., 5 for 5%</small>
                     </div>
                     <div class="form-group" style="margin-top: 1.5rem;">
-                        <label for="description" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Description</label>
-                        <textarea id="description" name="description" class="form-control" 
-                                  style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; min-height: 80px; resize: vertical;">${settings.description || ''}</textarea>
-                        <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">Optional notes about these settings</small>
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" name="description" class="form-control input-field" 
+                                  style="min-height: 80px; resize: vertical;">${settings.description || ''}</textarea>
+                        <small class="form-helper-text">Optional notes about these settings</small>
                     </div>
                 </form>
             </div>
@@ -321,7 +319,7 @@ function showProfileModal(user) {
     const lastNameValue = (user.last_name && user.last_name.trim()) ? user.last_name : '';
     
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content settings-modal">
             <div class="modal-header">
                 <h2>Edit Profile</h2>
                 <button class="modal-close" id="closeProfileModal">
@@ -331,22 +329,19 @@ function showProfileModal(user) {
             <div class="modal-body">
                 <form id="profileEditForm">
                     <div class="form-group">
-                        <label for="profileEmail" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email</label>
-                        <input type="email" id="profileEmail" name="email" class="form-control" 
-                               placeholder="Enter your email address"
-                               style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;">
+                        <label for="profileEmail" class="form-label">Email</label>
+                        <input type="email" id="profileEmail" name="email" class="form-control input-field" 
+                               placeholder="Enter your email address">
                     </div>
                     <div class="form-group" style="margin-top: 1rem;">
-                        <label for="profileFirstName" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">First Name</label>
-                        <input type="text" id="profileFirstName" name="first_name" class="form-control" 
-                               placeholder="Enter your first name"
-                               style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;">
+                        <label for="profileFirstName" class="form-label">First Name</label>
+                        <input type="text" id="profileFirstName" name="first_name" class="form-control input-field" 
+                               placeholder="Enter your first name">
                     </div>
                     <div class="form-group" style="margin-top: 1rem;">
-                        <label for="profileLastName" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Last Name</label>
-                        <input type="text" id="profileLastName" name="last_name" class="form-control" 
-                               placeholder="Enter your last name"
-                               style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;">
+                        <label for="profileLastName" class="form-label">Last Name</label>
+                        <input type="text" id="profileLastName" name="last_name" class="form-control input-field" 
+                               placeholder="Enter your last name">
                     </div>
                 </form>
             </div>
@@ -440,7 +435,7 @@ function openChangePasswordModal() {
     modal.className = 'modal active';
     
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content settings-modal">
             <div class="modal-header">
                 <h2>Change Password</h2>
                 <button class="modal-close" id="closePasswordModal">
@@ -450,23 +445,20 @@ function openChangePasswordModal() {
             <div class="modal-body">
                 <form id="changePasswordForm">
                     <div class="form-group">
-                        <label for="oldPassword" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Current Password</label>
-                        <input type="password" id="oldPassword" name="old_password" class="form-control" 
-                               placeholder="Enter your current password"
-                               style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;" required>
+                        <label for="oldPassword" class="form-label">Current Password</label>
+                        <input type="password" id="oldPassword" name="old_password" class="form-control input-field" 
+                               placeholder="Enter your current password" required>
                     </div>
                     <div class="form-group" style="margin-top: 1rem;">
-                        <label for="newPassword" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">New Password</label>
-                        <input type="password" id="newPassword" name="new_password" class="form-control" 
-                               placeholder="Enter your new password"
-                               style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;" required>
-                        <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">Minimum 6 characters</small>
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" id="newPassword" name="new_password" class="form-control input-field" 
+                               placeholder="Enter your new password" required>
+                        <small class="form-helper-text">Minimum 6 characters</small>
                     </div>
                     <div class="form-group" style="margin-top: 1rem;">
-                        <label for="confirmPassword" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Confirm Password</label>
-                        <input type="password" id="confirmPassword" name="confirm_password" class="form-control" 
-                               placeholder="Re-enter your new password"
-                               style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;" required>
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirm_password" class="form-control input-field" 
+                               placeholder="Re-enter your new password" required>
                     </div>
                 </form>
             </div>
@@ -570,7 +562,7 @@ function openBackupModal() {
     modal.className = 'modal active';
     
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content settings-modal">
             <div class="modal-header">
                 <h2>Create Backup</h2>
                 <button class="modal-close" id="closeBackupModal">
@@ -580,18 +572,16 @@ function openBackupModal() {
             <div class="modal-body">
                 <form id="backupForm">
                     <div class="form-group">
-                        <label for="backupStartDate" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Start Date</label>
-                        <input type="date" id="backupStartDate" name="start_date" class="form-control" 
-                               value="${startDate}"
-                               style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;" required>
+                        <label for="backupStartDate" class="form-label">Start Date</label>
+                        <input type="date" id="backupStartDate" name="start_date" class="form-control input-field" 
+                               value="${startDate}" required>
                     </div>
                     <div class="form-group" style="margin-top: 1rem;">
-                        <label for="backupEndDate" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">End Date</label>
-                        <input type="date" id="backupEndDate" name="end_date" class="form-control" 
-                               value="${endDate}"
-                               style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;" required>
+                        <label for="backupEndDate" class="form-label">End Date</label>
+                        <input type="date" id="backupEndDate" name="end_date" class="form-control input-field" 
+                               value="${endDate}" required>
                     </div>
-                    <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">
+                    <small class="form-helper-text">
                         <i class="fas fa-info-circle"></i> Backup will include all records created within this date range
                     </small>
                 </form>

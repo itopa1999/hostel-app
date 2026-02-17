@@ -1,0 +1,174 @@
+/* Reports Page - Inline Styles Extracted */
+
+/* Report Output Container */
+.report-output-container {
+    margin-top: 1rem;
+}
+
+/* Report Headers */
+.report-title {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.report-date-text {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.report-date-text strong {
+    font-weight: 600;
+}
+
+/* Report Card Grid */
+.report-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.report-cards-grid.wide {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+/* Report Card */
+.report-card {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.report-card-label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.report-card-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.report-card-value.occupied {
+    color: #ff9800;
+}
+
+.report-card-value.available {
+    color: #4caf50;
+}
+
+.report-card-value.success {
+    color: var(--success);
+}
+
+.report-card-value.small {
+    font-size: 1.1rem;
+}
+
+.report-card-value.break-word {
+    word-break: break-word;
+}
+
+.report-card-gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    color: white;
+}
+
+.report-card-gradient.sales {
+    background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+}
+
+.report-card-gradient.grid-span-2 {
+    grid-column: span 2;
+}
+
+.report-card-gradient-label {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.report-card-gradient-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.report-card-gradient-value.large {
+    font-size: 1.8rem;
+}
+
+/* Room Type/Payment Method Breakdown */
+.breakdown-container {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.breakdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.breakdown-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.breakdown-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Section Headers */
+.report-section-header {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Export Report Sections */
+.export-section {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.export-section-title {
+    margin-bottom: 0.75rem;
+    color: var(--primary);
+}
+
+.export-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.export-grid-item {
+    padding: 0;
+}
+
+.export-grid-item-label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.export-grid-item-value {
+    font-weight: 700;
+}
+
+.export-grid-item-value.success {
+    color: #4caf50;
+}
+
+.export-grid-item-value.primary {
+    color: var(--primary);
+}

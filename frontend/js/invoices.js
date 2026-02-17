@@ -3,6 +3,8 @@ let accessToken = null;
 let allInvoices = [];
 let allBookings = [];
 let currentInvoiceId = null;
+let pendingActionBookingId = null;
+let pendingActionType = null;
 
 if (typeof CookieManager === 'undefined') {
     console.error('CookieManager not found. Make sure main.js is loaded before invoices.js');
@@ -18,8 +20,84 @@ document.addEventListener('DOMContentLoaded', function() {
     hidePreloader();
     loadBookings();
     loadInvoices();
+    createConfirmationModal();
+    setupConfirmationModalListeners();
     setupEventListeners();
 });
+
+function createConfirmationModal() {
+    // Check if modal already exists
+    if (document.getElementById('confirmationModalOverlay')) {
+        return;
+    }
+    
+    const modalHTML = `
+        <div id="confirmationModalOverlay" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+            <div class="confirmation-modal" style="background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); max-width: 400px; width: 90%; padding: 0; overflow: hidden;">
+                <div style="padding: 24px; border-bottom: 1px solid #e0e0e0;">
+                    <h2 id="confirmationTitle" style="margin: 0; font-size: 18px; color: #333; font-weight: 600;">Confirm Action</h2>
+                </div>
+                <div style="padding: 20px;">
+                    <p id="confirmationMessage" style="margin: 0 0 20px 0; color: #666; font-size: 14px; line-height: 1.6;">Are you sure?</p>
+                </div>
+                <div style="padding: 16px 24px; border-top: 1px solid #e0e0e0; display: flex; gap: 10px; justify-content: flex-end;">
+                    <button id="confirmationCancelBtn" class="btn" style="padding: 8px 16px; background: #f0f0f0; color: #333; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;">Cancel</button>
+                    <button id="confirmationConfirmBtn" class="btn btn-primary" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;">Confirm</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function setupConfirmationModalListeners() {
+    const overlay = document.getElementById('confirmationModalOverlay');
+    const cancelBtn = document.getElementById('confirmationCancelBtn');
+    const confirmBtn = document.getElementById('confirmationConfirmBtn');
+    
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeConfirmationModal);
+    }
+    
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', async () => {
+            await executeConfirmedAction();
+            closeConfirmationModal();
+        });
+    }
+    
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                closeConfirmationModal();
+            }
+        });
+    }
+}
+
+function showConfirmationModal(title, message, actionType, bookingId) {
+    document.getElementById('confirmationTitle').textContent = title;
+    document.getElementById('confirmationMessage').textContent = message;
+    document.getElementById('confirmationModalOverlay').style.display = 'flex';
+    
+    pendingActionType = actionType;
+    pendingActionBookingId = bookingId;
+}
+
+function closeConfirmationModal() {
+    document.getElementById('confirmationModalOverlay').style.display = 'none';
+    pendingActionType = null;
+    pendingActionBookingId = null;
+}
+
+async function executeConfirmedAction() {
+    if (pendingActionType === 'checkout') {
+        await performCheckOut(pendingActionBookingId);
+    } else if (pendingActionType === 'checkin') {
+        await performCheckIn(pendingActionBookingId);
+    }
+}
 
 function displayDefaultInvoices() {
     // Default data removed - fetching from backend
@@ -117,7 +195,22 @@ function displayInvoicesAsRows(invoices) {
     }
     
     container.style.display = 'grid';
-    container.innerHTML = invoices.map(invoice => `
+    container.innerHTML = invoices.map(invoice => {
+        // Determine checkout alert styling and message
+        let checkoutAlert = '';
+        if (invoice.checkout_status === 'TODAY') {
+            checkoutAlert = `<div class="checkout-alert checkout-today" style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 0.5rem; margin-bottom: 0.5rem; border-radius: 4px;">
+                <i class="fas fa-clock" style="color: #ffc107; margin-right: 0.5rem;"></i>
+                <strong>Checkout Today!</strong> Guest checkout is due today.
+            </div>`;
+        } else if (invoice.checkout_status === 'OVERDUE') {
+            checkoutAlert = `<div class="checkout-alert checkout-overdue" style="background-color: #f8d7da; border-left: 4px solid #dc3545; padding: 0.5rem; margin-bottom: 0.5rem; border-radius: 4px;">
+                <i class="fas fa-exclamation-triangle" style="color: #dc3545; margin-right: 0.5rem;"></i>
+                <strong>Checkout Overdue!</strong> Guest checkout date has passed. Please follow up.
+            </div>`;
+        }
+        
+        return `
         <div class="invoice-card" style="${invoice.is_deleted ? 'opacity: 0.6; border: 2px solid #ff6b6b;' : ''}">
             <div class="invoice-card-header">
                 <div class="invoice-number">
@@ -134,6 +227,11 @@ function displayInvoicesAsRows(invoices) {
                     <button class="icon-btn print-invoice-btn" title="Print" onclick="printInvoice(${invoice.id})">
                         <i class="fas fa-print"></i>
                     </button>
+                    ${(invoice.checkout_status === 'TODAY' || invoice.checkout_status === 'OVERDUE') && invoice.booking_status !== 'CHECKED_OUT' && invoice.booking_status !== 'CANCELLED' && invoice.payment_status === 'COMPLETED' ? `
+                    <button class="icon-btn checkout-btn" title="Check Out Guest" onclick="checkOutGuest(${invoice.booking})" style="color: #28a745;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                    ` : ''}
                     ${invoice.payment_status === 'COMPLETED' && invoice.check_in && invoice.check_out && 
                       new Date(invoice.check_in) <= new Date(invoice.today) && 
                       new Date(invoice.today) <= new Date(invoice.check_out) ? `
@@ -143,6 +241,7 @@ function displayInvoicesAsRows(invoices) {
                     ` : ''}
                 </div>
             </div>
+            ${checkoutAlert}
             <div class="invoice-card-body">
                 <div class="invoice-info">
                     <span class="info-label">Guest:</span>
@@ -168,7 +267,7 @@ function displayInvoicesAsRows(invoices) {
                 </div>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function openCreateModal() {
@@ -272,6 +371,39 @@ function openDetailsModal(invoiceId) {
 
 function closeDetailsModal() {
     document.getElementById('detailsInvoiceModal').classList.remove('active');
+}
+
+async function checkOutGuest(bookingId) {
+    showConfirmationModal(
+        '🚪 Check Out Guest',
+        'Are you sure you want to check out this guest? The room will become available.',
+        'checkout',
+        bookingId
+    );
+}
+
+async function performCheckOut(bookingId) {
+    try {
+        const response = await APIInterceptor.fetch(`${ADMIN_URL}booking/${bookingId}/check-out/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.is_success || response.ok) {
+            showModal('✓ Guest checked out successfully! Room is now available.', 'success');
+            loadInvoices();
+        } else {
+            showModal(data.message || 'Failed to check out guest.', 'fail');
+        }
+    } catch (error) {
+        console.error('Error checking out guest:', error);
+        showModal('Error checking out guest. Please try again.', 'fail');
+    }
 }
 
 function printInvoice(invoiceId) {
@@ -602,6 +734,15 @@ async function checkInGuest(bookingId) {
         return;
     }
     
+    showConfirmationModal(
+        '🚪 Check In Guest',
+        'Are you sure you want to check in this guest? The room will be marked as occupied.',
+        'checkin',
+        bookingId
+    );
+}
+
+async function performCheckIn(bookingId) {
     try {        
         const response = await APIInterceptor.fetch(`${ADMIN_URL}booking/${bookingId}/check-in/`, {
             method: 'POST',
@@ -614,7 +755,7 @@ async function checkInGuest(bookingId) {
         const data = await response.json();
         
         if (data.is_success) {
-            showModal('Guest checked in successfully!', 'success');
+            showModal('✓ Guest checked in successfully!', 'success');
             loadInvoices();  // Refresh the list
         } else {
             showModal(data.message || 'Failed to check in guest.', 'fail');

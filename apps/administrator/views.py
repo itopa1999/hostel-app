@@ -334,6 +334,15 @@ class BookingCheckInAPIView(generics.GenericAPIView):
         return Response(result.to_dict(), status=result.status_code)
 
 
+class BookingCheckOutAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticatedAndNotDeleted]
+    serializer_class = BookingSerializer
+    
+    def post(self, request, booking_id):
+        result = BookingCommand.CheckOut(booking_id, request.user)
+        return Response(result.to_dict(), status=result.status_code)
+
+
 # Invoice endpoints
 class InvoiceCreateAPIView(generics.GenericAPIView):
     permission_classes = [IsAuthenticatedAndNotDeleted]

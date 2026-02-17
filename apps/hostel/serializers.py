@@ -57,11 +57,16 @@ class BookingSerializer(serializers.ModelSerializer):
     guest_name = serializers.CharField(source='guest.name', read_only=True)
     room_number = serializers.CharField(source='room.number', read_only=True)
     room_type_name = serializers.CharField(source='room.room_type.name', read_only=True)
+    checkout_status = serializers.SerializerMethodField()
+    
+    def get_checkout_status(self, obj):
+        """Get the checkout status for the booking"""
+        return obj.get_checkout_status()
     
     class Meta:
         model = Booking
-        fields = ['id', 'guest', 'guest_name', 'room', 'room_number', 'room_type_name', 'confirmation_code', 'check_in', 'check_out', 'number_of_guests', 'status', 'payment_status', 'special_requests', 'cancellation_date', 'cancellation_reason', 'created_at', 'modified_at', 'is_deleted']
-        read_only_fields = ['id', 'confirmation_code', 'created_at', 'modified_at', 'is_deleted']
+        fields = ['id', 'guest', 'guest_name', 'room', 'room_number', 'room_type_name', 'confirmation_code', 'check_in', 'check_out', 'number_of_guests', 'status', 'payment_status', 'checkout_status', 'special_requests', 'cancellation_date', 'cancellation_reason', 'created_at', 'modified_at', 'is_deleted']
+        read_only_fields = ['id', 'confirmation_code', 'checkout_status', 'created_at', 'modified_at', 'is_deleted']
 
 
 class InvoiceSerializer(serializers.ModelSerializer):
@@ -73,6 +78,8 @@ class InvoiceSerializer(serializers.ModelSerializer):
     room = serializers.CharField(source='booking.room.number', read_only=True)
     room_type = serializers.CharField(source='booking.room.room_type.name', read_only=True)
     number_of_guests = serializers.IntegerField(source='booking.number_of_guests', read_only=True)
+    booking_status = serializers.CharField(source='booking.status', read_only=True)
+    checkout_status = serializers.SerializerMethodField()
     
     def get_nights(self, obj):
         """Calculate number of nights from booking check_in and check_out dates"""
@@ -81,10 +88,14 @@ class InvoiceSerializer(serializers.ModelSerializer):
             return nights if nights > 0 else 1
         return 1
     
+    def get_checkout_status(self, obj):
+        """Get the checkout status from the invoice's booking"""
+        return obj.get_checkout_status()
+    
     class Meta:
         model = Invoice
-        fields = ['id', 'booking', 'booking_confirmation', 'guest_name', 'room', 'room_type', 'number_of_guests', 'check_in', 'check_out', 'nights', 'invoice_number', 'subtotal', 'discount_amount', 'tax', 'total', 'payment_status', 'due_date', 'payment_date', 'notes', 'created_at', 'modified_at', 'is_deleted']
-        read_only_fields = ['id', 'invoice_number', 'created_at', 'modified_at', 'is_deleted']
+        fields = ['id', 'booking', 'booking_confirmation', 'guest_name', 'room', 'room_type', 'number_of_guests', 'check_in', 'check_out', 'nights', 'invoice_number', 'subtotal', 'discount_amount', 'tax', 'total', 'payment_status', 'checkout_status', 'booking_status', 'due_date', 'payment_date', 'notes', 'created_at', 'modified_at', 'is_deleted']
+        read_only_fields = ['id', 'invoice_number', 'checkout_status', 'booking_status', 'created_at', 'modified_at', 'is_deleted']
 
 
 class PaymentSerializer(serializers.ModelSerializer):

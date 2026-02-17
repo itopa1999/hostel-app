@@ -64,6 +64,20 @@ class DashboardQuery:
             status=BookingStatus.CANCELLED.value
         ).count()
         
+        # Checkout status breakdown (for active bookings only)
+        from django.utils import timezone
+        today = timezone.now().date()
+        
+        checkout_today = Booking.objects.filter(
+            is_deleted=False,
+            check_out=today
+        ).exclude(status__in=[BookingStatus.CANCELLED.value, BookingStatus.CHECKED_OUT.value]).count()
+        
+        checkout_overdue = Booking.objects.filter(
+            is_deleted=False,
+            check_out__lt=today
+        ).exclude(status__in=[BookingStatus.CANCELLED.value, BookingStatus.CHECKED_OUT.value]).count()
+        
         # Payment status breakdown
         payment_pending = Payment.objects.filter(
             is_deleted=False,
@@ -158,6 +172,10 @@ class DashboardQuery:
                 'checked_in': booking_checked_in,
                 'checked_out': booking_checked_out,
                 'cancelled': booking_cancelled,
+            },
+            'checkout_status': {
+                'today': checkout_today,
+                'overdue': checkout_overdue,
             },
             'payment_status': {
                 'pending': payment_pending,
